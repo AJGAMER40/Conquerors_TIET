@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next-Gen Career Portal</title>
+    <style>
+        :root {
+            --primary-glow: #6366f1;
+            --secondary-glow: #a855f7;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            background: #050505;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        /* --- DYNAMIC BACKGROUND --- */
+        .mesh-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+        }
+
+        /* --- SECTION 1: HERO --- */
+        .hero-section {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* --- HEADER NAV --- */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            z-index: 100;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, var(--secondary-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-glow);
+        }
+
+        .nav-btn.primary {
+            background: white;
+            color: #000;
+            border: none;
+        }
+
+        .nav-btn.primary:hover {
+            background: #e2e8f0;
+        }
+
+        .glass-card {
+            position: relative;
+            padding: 4rem 3rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 40px;
+            backdrop-filter: blur(20px);
+            text-align: center;
+            max-width: 900px;
+            animation: fadeInDown 1.2s ease-out;
+            background-color: #282828;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            margin: 0;
+            background: linear-gradient(to bottom right, #fff 40%, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+        }
+
+        .search-container {
+            margin-top: 2.5rem;
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        input {
+            background: transparent;
+            border: none;
+            padding: 12px 20px;
+            color: white;
+            outline: none;
+            min-width: 250px;
+            flex-grow: 1;
+        }
+
+        .btn-main {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-main:hover {
+            transform: scale(1.05);
+            background: #e2e8f0;
+        }
+
+        /* --- SECTION 2: CHOOSE PATH --- */
+        .path-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem 1rem;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: 1s all ease;
+        }
+
+        .path-container {
+            display: flex;
+            gap: 2rem;
+            max-width: 1100px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .path-card {
+            flex: 1;
+            min-width: 300px;
+            background: #121212;
+            border: 1px solid #333;
+            border-radius: 24px;
+            padding: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .path-card:hover {
+            border-color: var(--secondary-glow);
+            background: #1a1a1a;
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            background: #222;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .path-card h3 {
+            font-size: 1.8rem;
+            margin: 0.5rem 0;
+        }
+
+        .path-card p {
+            color: #888;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+
+        .btn-outline {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid #444;
+            background: transparent;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-filled {
+            background: white;
+            color: black;
+            border: none;
+        }
+
+        .btn-outline:hover {
+            background: #222;
+            border-color: #666;
+        }
+
+        /* --- ANIMATION CLASSES --- */
+        .reveal {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .app-links {
+            display: flex;
+            gap: 10px;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #666;
+            justify-content: center;
+        }
+
+        /* --- AUTH MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            padding: 40px;
+            border-radius: 24px;
+            max-width: 450px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 28px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-modal:hover {
+            color: white;
+        }
+
+        .modal-header h2 {
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .modal-header p {
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-glow);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: white;
+            color: #000;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 15px;
+        }
+
+        .submit-btn:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        .form-toggle {
+            text-align: center;
+            margin-top: 20px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .form-toggle a {
+            color: var(--primary-glow);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .form-toggle a:hover {
+            color: var(--secondary-glow);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="mesh-bg"></div>
+
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="logo-text">EduPortal</div>
+        <div style="display: flex; gap: 12px;">
+            <button class="nav-btn" onclick="openLoginModal()">Login</button>
+            <button class="nav-btn primary" onclick="openRegisterModal()">Get Started</button>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="glass-card">
+            <span
+                style="color: var(--secondary-glow); letter-spacing: 2px; font-size: 0.8rem; text-transform: uppercase;">Trusted
+                by 2M+ Learners</span>
+            <h1>Learning that adapts<br> to every learner.</h1>
+            <p style="color: #94a3b8; margin: 1.5rem auto; max-width: 600px;">The modern way to find your next career
+                move with AI-driven matching and Visual Learning.</p>
+
+            <!-- <div class="search-container">
+                <input type="text" placeholder="Search lessons, subjects or skills...">
+                <button class="btn-main">Search</button>
+            </div> -->
+
+            <div style="margin-top: 2rem;">
+                <a href="#paths" style="color: #fff; text-decoration: none; font-size: 0.9rem; opacity: 0.6;">Scroll to
+                    explore ↓</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="path-section" id="paths">
+        <h2 class="section-title">Choose your <span style="color: var(--secondary-glow);">path.</span></h2>
+
+        <div class="path-container">
+            <div class="path-card">
+                <div class="icon-box">🏢</div>
+                <h3>For Educators and Institutions</h3>
+                <p> AI-powered tools to make learning accessible through simplified text, audio, visuals, and adaptive
+                    interactions.</p>
+                <a class="btn-outline btn-filled" href="new8.html">Enable accessibilty </a>
+            </div>
+
+            <div class="path-card">
+                <div class="icon-box">🎓</div>
+                <h3>For Learners</h3>
+                <p>Access learning in formats that fit you—text, audio, visuals, and adaptive experiences.</p>
+                <a href="new3.html" class="btn-outline">Visit Website</a>
+                <div class="app-links">
+                    <span> App Store</span>
+                    <span>▶ Play Store</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Authentication Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+
+            <!-- Login Form -->
+            <div id="loginForm">
+                <div class="modal-header">
+                    <h2>Welcome Back</h2>
+                    <p>Login to access your learning dashboard</p>
+                </div>
+
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Student ID</label>
+                        <input type="text" id="loginStudentId" placeholder="Ex: PEC20CS001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Login</button>
+                </form>
+
+                <div class="form-toggle">
+                    Don't have an account?
+                    <a href="#" onclick="switchToRegister(event)">Register here</a>
+                </div>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="hidden">
+                <div class="modal-header">
+                    <h2>Create Account</h2>
+                    <p>Join us to start your learning journey</p>
+                </div>
+
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="registerName" placeholder="Ex: John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Student ID</label>
+                        <input type="text" id="registerStudentId" placeholder="Ex: PEC20CS001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="registerEmail" placeholder="Ex: john@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="registerPassword" placeholder="••••••••" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="registerConfirmPassword" placeholder="••••••••" required
+                            minlength="6">
+                    </div>
+                    <button type="submit" class="submit-btn">Create Account</button>
+                </form>
+
+                <div class="form-toggle">
+                    Already have an account?
+                    <a href="#" onclick="switchToLogin(event)">Login here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = '/api';
+
+        // Modal functions
+        function openLoginModal() {
+            document.getElementById('authModal').classList.add('active');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+        }
+
+        function openRegisterModal() {
+            document.getElementById('authModal').classList.add('active');
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('loginForm').classList.add('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+
+        function switchToRegister(e) {
+            e.preventDefault();
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+        }
+
+        function switchToLogin(e) {
+            e.preventDefault();
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+        }
+
+        // API functions
+        async function handleLogin(e) {
+            e.preventDefault();
+
+            const studentId = document.getElementById('loginStudentId').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        student_id: studentId,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.token) {
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    alert('Login successful! Redirecting to dashboard...');
+                    window.location.href = '/new3.html';
+                } else {
+                    alert(data.error || 'Login failed. Please check your credentials.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Unable to connect to server. Please ensure the backend is running.');
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('registerName').value;
+            const studentId = document.getElementById('registerStudentId').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            // Validate password length
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        student_id: studentId,
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.token) {
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    alert('Account created successfully! Redirecting to dashboard...');
+                    window.location.href = '/new3.html';
+                } else {
+                    alert(data.error || 'Registration failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('Unable to connect to server. Please ensure the backend is running.');
+            }
+        }
+
+        // Simple Scroll Reveal Logic
+        const observerOptions = { threshold: 0.2 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal');
+                }
+            });
+        }, observerOptions);
+
+        // Elements to animate
+        document.querySelectorAll('.path-card, .section-title').forEach(el => observer.observe(el));
+
+        // Close modal on outside click
+        document.getElementById('authModal').addEventListener('click', (e) => {
+            if (e.target.id === 'authModal') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+
+</html>

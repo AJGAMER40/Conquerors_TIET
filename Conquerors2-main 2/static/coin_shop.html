@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🪙 Coin Shop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #07090f;
+    --surface: #0d1018;
+    --card:    #111520;
+    --border:  #1a2035;
+    --gold:    #f4d03f;
+    --gold2:   #e8901a;
+    --gold-dim: rgba(244,208,63,0.08);
+    --text:    #d4daf0;
+    --muted:   #4a5580;
+    --green:   #3ddc84;
+    --red:     #ff4d6d;
+    --blue:    #4fc3f7;
+    --radius:  14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* Decorative background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(244,208,63,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 80% 90%, rgba(232,144,26,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(7,9,15,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--gold);
+    letter-spacing: 3px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-coin {
+    width: 30px; height: 30px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 0 16px rgba(244,208,63,0.5);
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+  }
+  @keyframes pulse-glow {
+    from { box-shadow: 0 0 8px rgba(244,208,63,0.3); }
+    to   { box-shadow: 0 0 24px rgba(244,208,63,0.7); }
+  }
+  .topbar-nav { display: flex; align-items: center; gap: 20px; }
+  .back-link {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex; align-items: center; gap: 6px;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--text); }
+  .balance-badge {
+    background: var(--gold-dim);
+    border: 1px solid rgba(244,208,63,0.3);
+    border-radius: 24px;
+    padding: 6px 18px;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    color: var(--gold);
+    font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ── PAGE WRAPPER ── */
+  .page {
+    position: relative; z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* ── HERO BANNER ── */
+  .hero {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: var(--gold-dim);
+    border: 1px solid rgba(244,208,63,0.25);
+    border-radius: 24px;
+    padding: 4px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .hero-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(32px, 6vw, 56px);
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, var(--gold) 30%, var(--gold2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto 32px;
+    line-height: 1.6;
+  }
+
+  /* Balance card */
+  .balance-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 24px;
+    background: linear-gradient(135deg, rgba(244,208,63,0.08), rgba(232,144,26,0.04));
+    border: 1px solid rgba(244,208,63,0.2);
+    border-radius: var(--radius);
+    padding: 24px 40px;
+    margin-bottom: 16px;
+  }
+  .balance-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    box-shadow: 0 0 24px rgba(244,208,63,0.4);
+  }
+  .balance-info { text-align: left; }
+  .balance-number {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+    text-shadow: 0 0 30px rgba(244,208,63,0.4);
+  }
+  .balance-label {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .earn-hint {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .earn-hint a {
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .earn-hint a:hover { text-decoration: underline; }
+
+  /* ── FILTER TABS ── */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+    justify-content: center;
+  }
+  .filter-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 8px 20px;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover { border-color: rgba(244,208,63,0.3); color: var(--text); }
+  .filter-btn.active {
+    background: var(--gold-dim);
+    border-color: rgba(244,208,63,0.5);
+    color: var(--gold);
+  }
+
+  /* ── VOUCHER GRID ── */
+  .voucher-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+
+  .voucher-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .voucher-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(244,208,63,0.04), transparent);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .voucher-card:hover {
+    border-color: rgba(244,208,63,0.35);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(244,208,63,0.15);
+  }
+  .voucher-card:hover::before { opacity: 1; }
+  .voucher-card.cant-afford {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .voucher-card.cant-afford:hover { transform: none; box-shadow: none; border-color: var(--border); }
+  .voucher-card.cant-afford:hover::before { opacity: 0; }
+
+  .voucher-emoji {
+    font-size: 40px;
+    line-height: 1;
+  }
+  .voucher-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .voucher-category {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+  }
+  .voucher-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .voucher-cost {
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .voucher-cost-icon { font-size: 16px; }
+  .btn-redeem {
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-redeem:hover { transform: scale(1.04); box-shadow: 0 4px 16px rgba(244,208,63,0.4); }
+  .btn-redeem:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* Insufficient badge */
+  .voucher-need {
+    font-size: 12px;
+    color: var(--red);
+    font-family: 'Space Mono', monospace;
+    display: none;
+  }
+  .cant-afford .voucher-need { display: block; }
+  .cant-afford .btn-redeem { display: none; }
+
+  /* ── CONFIRM MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.88);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--card);
+    border: 1px solid rgba(244,208,63,0.2);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    animation: pop-in 0.35s cubic-bezier(0.175,0.885,0.32,1.275);
+    box-shadow: 0 0 60px rgba(244,208,63,0.1);
+  }
+  @keyframes pop-in { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal-icon { font-size: 56px; margin-bottom: 12px; }
+  .modal-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--gold);
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+  }
+  .modal-body {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+  .modal-cost {
+    font-family: 'Space Mono', monospace;
+    font-size: 24px;
+    color: var(--gold);
+    font-weight: 700;
+    margin: 12px 0;
+  }
+  .modal-btns { display: flex; gap: 12px; }
+  .btn-confirm {
+    flex: 1;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-confirm:hover { box-shadow: 0 4px 20px rgba(244,208,63,0.4); }
+  .btn-cancel {
+    flex: 1;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-cancel:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+  /* ── SUCCESS MODAL ── */
+  .success-modal {
+    background: var(--card);
+    border: 1px solid rgba(61,220,132,0.3);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 440px;
+    width: 90%;
+    text-align: center;
+    animation: pop-in 0.35s cubic-bezier(0.175,0.885,0.32,1.275);
+    box-shadow: 0 0 60px rgba(61,220,132,0.08);
+  }
+  .code-display {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(61,220,132,0.3);
+    border-radius: 10px;
+    padding: 16px 24px;
+    font-family: 'Space Mono', monospace;
+    font-size: 22px;
+    letter-spacing: 4px;
+    color: var(--green);
+    margin: 20px 0;
+    word-break: break-all;
+  }
+  .code-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+  .btn-close {
+    width: 100%;
+    background: rgba(61,220,132,0.12);
+    color: var(--green);
+    border: 1px solid rgba(61,220,132,0.3);
+    border-radius: 10px;
+    padding: 14px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-close:hover { background: rgba(61,220,132,0.2); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--muted);
+  }
+  .empty-state .big { font-size: 48px; margin-bottom: 12px; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 32px; right: 32px;
+    background: var(--card);
+    border: 1px solid rgba(244,208,63,0.3);
+    border-radius: 10px;
+    padding: 14px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gold);
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  @media (max-width: 600px) {
+    .topbar { padding: 0 16px; }
+    .page { padding: 24px 16px 60px; }
+    .balance-card { flex-direction: column; padding: 20px; text-align: center; }
+    .balance-info { text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-coin">🪙</div>
+    COIN SHOP
+  </div>
+  <div class="topbar-nav">
+    <a href="battle_arena.html" class="back-link">← Battle Arena</a>
+    <div class="balance-badge">
+      <span>🪙</span>
+      <span id="topBalance">0</span>
+    </div>
+  </div>
+</header>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">🪙 Redeem Sikke</div>
+    <h1 class="hero-title">Coin Shop</h1>
+    <p class="hero-sub">Spend your Sikke earned from battle victories on real-world vouchers and rewards.</p>
+
+    <div class="balance-card">
+      <div class="balance-icon">🪙</div>
+      <div class="balance-info">
+        <div class="balance-number" id="mainBalance">0</div>
+        <div class="balance-label">Sikke Available</div>
+      </div>
+    </div>
+    <div class="earn-hint">
+      Win battles to earn more Sikke.
+      <a href="battle_arena.html">→ Go to Battle Arena</a>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filter-bar">
+    <button class="filter-btn active" data-cat="All">All</button>
+    <button class="filter-btn" data-cat="Shopping">🛍️ Shopping</button>
+    <button class="filter-btn" data-cat="Food">🍔 Food</button>
+    <button class="filter-btn" data-cat="Entertainment">🎬 Entertainment</button>
+    <button class="filter-btn" data-cat="Payments">💳 Payments</button>
+    <button class="filter-btn" data-cat="Game">⚡ Game</button>
+  </div>
+
+  <!-- GRID -->
+  <div class="voucher-grid" id="voucherGrid">
+    <div class="empty-state" id="loadingState">
+      <div class="big">⏳</div>
+      <div>Loading vouchers…</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="modal-icon" id="confirmIcon">🛍️</div>
+    <div class="modal-title">Confirm Redeem</div>
+    <div class="modal-body">
+      You're about to spend Sikke for:
+      <br><strong id="confirmName" style="color:var(--text)">—</strong>
+    </div>
+    <div class="modal-cost" id="confirmCost">🪙 0</div>
+    <div class="modal-body" style="font-size:13px; margin-bottom:0;">
+      You'll have <span id="confirmAfter" style="color:var(--gold)">0</span> Sikke remaining.
+    </div>
+    <br>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-confirm" id="btnConfirmRedeem">Redeem!</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successModal">
+  <div class="success-modal">
+    <div style="font-size:56px; margin-bottom:8px;">🎉</div>
+    <div class="modal-title" style="color:var(--green); border:none;">Redeemed!</div>
+    <div style="color:var(--muted); font-size:15px; margin-bottom:4px;">Your voucher code:</div>
+    <div class="code-display" id="voucherCode">XXXX-YYYY-ZZZZ</div>
+    <div class="code-note">
+      Copy this code and use it on the partner's website.<br>
+      This is a demo code — in a real deployment, codes would be sent to your email.
+    </div>
+    <button class="btn-close" onclick="closeSuccess()">✓ Done</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:5000/api';
+let token = localStorage.getItem('authToken') || localStorage.getItem('token');
+let sikkeBalance = 0;
+let vouchers = [];
+let pendingVoucher = null;
+let activeCategory = 'All';
+
+// Auth guard
+if (!token) {
+  alert('Please log in first.');
+  window.location.href = '/new3.html';
+}
+
+function authHeaders() {
+  return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+}
+
+// ── LOAD BALANCE ─────────────────────────────────────────────────────────────
+async function loadBalance() {
+  try {
+    const r = await fetch(`${API}/user/sikke`, { headers: authHeaders() });
+    if (r.ok) {
+      const d = await r.json();
+      sikkeBalance = d.sikke || 0;
+      updateBalanceDisplay();
+      renderVouchers();
+    }
+  } catch(e) { console.error(e); }
+}
+
+function updateBalanceDisplay() {
+  document.getElementById('topBalance').textContent = sikkeBalance;
+  document.getElementById('mainBalance').textContent = sikkeBalance;
+}
+
+// ── LOAD VOUCHERS ────────────────────────────────────────────────────────────
+async function loadVouchers() {
+  try {
+    const r = await fetch(`${API}/shop/vouchers`);
+    vouchers = await r.json();
+    renderVouchers();
+  } catch(e) {
+    // Fallback catalogue if API unavailable
+    vouchers = [
+      {id:'v1', name:'Amazon Gift Card ₹100', cost:50,  icon:'🛍️', category:'Shopping'},
+      {id:'v2', name:'Swiggy ₹50 Off',        cost:25,  icon:'🍔', category:'Food'},
+      {id:'v3', name:'Zomato ₹50 Off',        cost:25,  icon:'🍕', category:'Food'},
+      {id:'v4', name:'Flipkart ₹200 Coupon',  cost:100, icon:'📦', category:'Shopping'},
+      {id:'v5', name:'Netflix 1-Month',        cost:150, icon:'🎬', category:'Entertainment'},
+      {id:'v6', name:'Spotify 1-Month',        cost:80,  icon:'🎵', category:'Entertainment'},
+      {id:'v7', name:'Paytm ₹30 Cashback',    cost:20,  icon:'💳', category:'Payments'},
+      {id:'v8', name:'Extra 100 XP Boost',     cost:30,  icon:'⚡', category:'Game'},
+    ];
+    renderVouchers();
+  }
+}
+
+// ── RENDER GRID ───────────────────────────────────────────────────────────────
+function renderVouchers() {
+  const grid = document.getElementById('voucherGrid');
+  const filtered = activeCategory === 'All'
+    ? vouchers
+    : vouchers.filter(v => v.category === activeCategory);
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="big">🔍</div><div>No vouchers in this category yet.</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(v => {
+    const canAfford = sikkeBalance >= v.cost;
+    const need = v.cost - sikkeBalance;
+    return `
+    <div class="voucher-card ${canAfford ? '' : 'cant-afford'}" data-id="${v.id}">
+      <div class="voucher-emoji">${v.icon}</div>
+      <div>
+        <div class="voucher-category">${v.category}</div>
+        <div class="voucher-name">${v.name}</div>
+      </div>
+      <div class="voucher-footer">
+        <div class="voucher-cost">
+          <span class="voucher-cost-icon">🪙</span>
+          ${v.cost}
+        </div>
+        <button class="btn-redeem" onclick="openConfirm('${v.id}')" ${canAfford ? '' : 'disabled'}>
+          Redeem
+        </button>
+        <div class="voucher-need">Need ${need} more</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── FILTER TABS ────────────────────────────────────────────────────────────────
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCategory = btn.dataset.cat;
+    renderVouchers();
+  });
+});
+
+// ── CONFIRM MODAL ─────────────────────────────────────────────────────────────
+function openConfirm(voucherId) {
+  pendingVoucher = vouchers.find(v => v.id === voucherId);
+  if (!pendingVoucher) return;
+  if (sikkeBalance < pendingVoucher.cost) { showToast('Not enough Sikke!'); return; }
+  document.getElementById('confirmIcon').textContent = pendingVoucher.icon;
+  document.getElementById('confirmName').textContent = pendingVoucher.name;
+  document.getElementById('confirmCost').textContent = `🪙 ${pendingVoucher.cost} Sikke`;
+  document.getElementById('confirmAfter').textContent = sikkeBalance - pendingVoucher.cost;
+  document.getElementById('confirmModal').classList.add('show');
+}
+
+function closeConfirm() {
+  document.getElementById('confirmModal').classList.remove('show');
+  pendingVoucher = null;
+}
+
+document.getElementById('btnConfirmRedeem').addEventListener('click', redeemVoucher);
+
+async function redeemVoucher() {
+  if (!pendingVoucher) return;
+  const btn = document.getElementById('btnConfirmRedeem');
+  btn.disabled = true;
+  btn.textContent = '⏳ Processing…';
+
+  try {
+    const r = await fetch(`${API}/shop/redeem`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ voucher_id: pendingVoucher.id })
+    });
+    const d = await r.json();
+
+    if (r.ok && d.success) {
+      sikkeBalance = d.remaining_sikke;
+      updateBalanceDisplay();
+      renderVouchers();
+      closeConfirm();
+      document.getElementById('voucherCode').textContent = d.code;
+      document.getElementById('successModal').classList.add('show');
+    } else {
+      showToast(d.error || 'Redemption failed');
+      btn.disabled = false;
+      btn.textContent = 'Redeem!';
+    }
+  } catch(e) {
+    showToast('Server error. Please try again.');
+    btn.disabled = false;
+    btn.textContent = 'Redeem!';
+  }
+}
+
+function closeSuccess() {
+  document.getElementById('successModal').classList.remove('show');
+}
+
+// Click outside to close modals
+document.getElementById('confirmModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeConfirm();
+});
+document.getElementById('successModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeSuccess();
+});
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.getElementById('loadingState').style.display = 'none';
+Promise.all([loadBalance(), loadVouchers()]);
+</script>
+</body>
+</html>

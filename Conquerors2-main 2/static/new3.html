@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduPortal — Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.min.js"></script>
+<style>
+/* ============================================================
+   THEME VARIABLES
+   ============================================================ */
+[data-theme="dark"] {
+  --bg:          #040610;
+  --bg2:         #080d1a;
+  --surface:     #0d1525;
+  --surface2:    #111e35;
+  --border:      #1a2540;
+  --border2:     #243060;
+  --text:        #e8f4ff;
+  --text-muted:  #4a6080;
+  --text-dim:    #8aa0c0;
+  --cyan:        #00f5ff;
+  --cyan-dim:    rgba(0,245,255,0.10);
+  --cyan-glow:   rgba(0,245,255,0.30);
+  --green:       #00ff88;
+  --green-dim:   rgba(0,255,136,0.10);
+  --orange:      #ff6b35;
+  --orange-dim:  rgba(255,107,53,0.12);
+  --pink:        #ff3cac;
+  --yellow:      #ffd60a;
+  --sidebar-bg:  #080d1a;
+  --header-bg:   rgba(4,6,16,0.90);
+  --card-bg:     #0d1525;
+  --grid-color:  rgba(0,245,255,0.03);
+  --scrollbar:   #1a2540;
+  --logo-color:  #00f5ff;
+  --stat-1-bg:   linear-gradient(135deg,#00f5ff22,#00f5ff08);
+  --stat-2-bg:   linear-gradient(135deg,#00ff8822,#00ff8808);
+  --stat-3-bg:   linear-gradient(135deg,#ff6b3522,#ff6b3508);
+  --shadow:      0 8px 32px rgba(0,0,0,0.5);
+  --modal-overlay: rgba(0,0,0,0.8);
+}
+
+[data-theme="light"] {
+  --bg:          #f0f4ff;
+  --bg2:         #e8eeff;
+  --surface:     #ffffff;
+  --surface2:    #f5f7ff;
+  --border:      #dde3f5;
+  --border2:     #c5cef0;
+  --text:        #0d1525;
+  --text-muted:  #8090b0;
+  --text-dim:    #4a5a80;
+  --cyan:        #0077cc;
+  --cyan-dim:    rgba(0,119,204,0.10);
+  --cyan-glow:   rgba(0,119,204,0.20);
+  --green:       #00a855;
+  --green-dim:   rgba(0,168,85,0.10);
+  --orange:      #e05a1a;
+  --orange-dim:  rgba(224,90,26,0.10);
+  --pink:        #cc0088;
+  --yellow:      #cc9900;
+  --sidebar-bg:  #ffffff;
+  --header-bg:   rgba(240,244,255,0.95);
+  --card-bg:     #ffffff;
+  --grid-color:  rgba(0,119,204,0.04);
+  --scrollbar:   #c5cef0;
+  --logo-color:  #0077cc;
+  --stat-1-bg:   linear-gradient(135deg,#0077cc18,#0077cc06);
+  --stat-2-bg:   linear-gradient(135deg,#00a85518,#00a85506);
+  --stat-3-bg:   linear-gradient(135deg,#e05a1a18,#e05a1a06);
+  --shadow:      0 4px 24px rgba(0,0,0,0.08);
+  --modal-overlay: rgba(80,100,160,0.4);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { font-size: 16px; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  transition: background 0.3s, color 0.3s;
+  position: relative;
+}
+
+/* GRID BACKGROUND */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+  transition: background-image 0.3s;
+}
+
+[data-theme="dark"] body::after {
+  content: '';
+  position: fixed;
+  top: -200px; right: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(0,245,255,0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 3px; }
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+.sidebar {
+  width: 240px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 18px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 36px;
+  cursor: pointer;
+}
+.logo-icon { width: 34px; height: 34px; flex-shrink: 0; }
+.logo-icon svg { width: 100%; height: 100%; }
+.logo-text {
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--logo-color);
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 16px var(--cyan-glow);
+}
+.logo-sub {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.nav-section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  padding: 0 10px;
+  margin: 12px 0 6px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--text-dim);
+  margin-bottom: 3px;
+  transition: all 0.2s;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.menu-item i { width: 16px; text-align: center; font-size: 0.82rem; }
+.menu-item:hover {
+  background: var(--cyan-dim);
+  color: var(--cyan);
+  border-color: rgba(0,245,255,0.15);
+}
+.menu-item.active {
+  background: var(--cyan-dim);
+  color: var(--cyan);
+  border-color: var(--cyan);
+  box-shadow: 0 0 14px var(--cyan-dim);
+  font-weight: 600;
+}
+[data-theme="light"] .menu-item.active {
+  box-shadow: 0 2px 10px var(--cyan-dim);
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.logout:hover { color: #ff5f57; background: rgba(255,95,87,0.08); }
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.header {
+  height: 62px;
+  background: var(--header-bg);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  flex-shrink: 0;
+  gap: 16px;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.search-bar {
+  position: relative;
+  flex: 1;
+  max-width: 320px;
+}
+.search-bar i {
+  position: absolute;
+  left: 13px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+.search-bar input {
+  width: 100%;
+  padding: 9px 14px 9px 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  outline: none;
+  transition: all 0.2s;
+}
+.search-bar input::placeholder { color: var(--text-muted); }
+.search-bar input:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px var(--cyan-dim); }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* THEME TOGGLE */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 50px;
+  padding: 5px 14px 5px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.78rem;
+  font-family: 'Space Mono', monospace;
+  color: var(--text-dim);
+  user-select: none;
+}
+.theme-toggle:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); }
+.toggle-track {
+  width: 32px; height: 18px;
+  border-radius: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  position: relative;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+[data-theme="light"] .toggle-track { background: var(--cyan); border-color: var(--cyan); }
+.toggle-thumb {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: all 0.3s;
+}
+[data-theme="light"] .toggle-thumb { left: 16px; background: #fff; }
+.toggle-icon { font-size: 0.9rem; }
+
+/* NOTIFICATION BELL */
+.notif-btn {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  position: relative;
+}
+.notif-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+.notif-dot {
+  position: absolute;
+  top: 7px; right: 7px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow: 0 0 6px var(--orange);
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 12px 5px 6px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: all 0.2s;
+}
+.user-profile:hover { border-color: var(--cyan); background: var(--cyan-dim); }
+.avatar {
+  width: 32px; height: 32px;
+  background: var(--cyan-dim);
+  color: var(--cyan);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: 0.72rem;
+  border: 1px solid var(--cyan);
+  font-family: 'Space Mono', monospace;
+}
+.user-info-text { font-weight: 600; font-size: 0.83rem; }
+.user-role-text { font-size: 0.68rem; color: var(--text-muted); font-family: 'Space Mono', monospace; }
+
+/* STATUS DOT */
+.live-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  padding: 5px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+/* ============================================================
+   DASHBOARD BODY
+   ============================================================ */
+.dashboard-body {
+  padding: 28px;
+  overflow-y: auto;
+  display: flex;
+  gap: 24px;
+  height: 100%;
+}
+
+.center-panel { flex: 1; min-width: 0; }
+.right-panel   { width: 290px; flex-shrink: 0; }
+
+/* WELCOME BANNER */
+.welcome-banner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.welcome-banner::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--green), var(--orange));
+}
+.welcome-banner::after {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, var(--cyan-dim) 0%, transparent 70%);
+  pointer-events: none;
+}
+.welcome-eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.welcome-eyebrow::before { content:''; width:20px; height:1px; background:var(--cyan); }
+.welcome-banner h1 {
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.welcome-banner h1 span { color: var(--cyan); }
+.welcome-banner p { color: var(--text-dim); font-size: 0.88rem; margin-top: 5px; }
+.welcome-cta {
+  background: var(--cyan);
+  border: none;
+  color: #000;
+  padding: 11px 22px;
+  border-radius: 8px;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 0 24px var(--cyan-glow);
+  white-space: nowrap;
+  flex-shrink: 0;
+  position: relative; z-index: 1;
+}
+.welcome-cta:hover { transform: translateY(-2px); box-shadow: 0 0 40px var(--cyan-glow); }
+
+/* ============================================================
+   STATS GRID
+   ============================================================ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  animation: fadeUp 0.5s both;
+}
+.stat-card:nth-child(1) { animation-delay: 0.05s; }
+.stat-card:nth-child(2) { animation-delay: 0.10s; }
+.stat-card:nth-child(3) { animation-delay: 0.15s; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.stat-card:nth-child(1)::before { background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
+.stat-card:nth-child(2)::before { background: var(--green); box-shadow: 0 0 12px var(--green); }
+.stat-card:nth-child(3)::before { background: var(--orange); box-shadow: 0 0 12px var(--orange); }
+.stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: var(--border2); }
+.stat-card:hover::before { opacity: 1; }
+
+.stat-icon-box {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.stat-card:nth-child(1) .stat-icon-box { background: var(--stat-1-bg); border: 1px solid rgba(0,245,255,0.2); color: var(--cyan); }
+.stat-card:nth-child(2) .stat-icon-box { background: var(--stat-2-bg); border: 1px solid rgba(0,255,136,0.2); color: var(--green); }
+.stat-card:nth-child(3) .stat-icon-box { background: var(--stat-3-bg); border: 1px solid rgba(255,107,53,0.2); color: var(--orange); }
+
+.stat-info { flex: 1; }
+.stat-info h3 { font-size: 1.7rem; font-weight: 900; letter-spacing: -0.02em; line-height: 1; }
+.stat-info span { font-size: 0.75rem; color: var(--text-muted); font-family: 'Space Mono', monospace; letter-spacing: 0.04em; }
+.stat-delta {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  padding: 2px 7px;
+  border-radius: 3px;
+  margin-top: 4px;
+  display: inline-block;
+}
+.delta-up   { background: var(--green-dim); color: var(--green); }
+.delta-down { background: var(--orange-dim); color: var(--orange); }
+
+/* ============================================================
+   SECTION HEADER
+   ============================================================ */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.section-header h3 {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-header h3::before {
+  content: '//';
+  color: var(--cyan);
+}
+.section-link {
+  font-size: 0.75rem;
+  color: var(--cyan);
+  font-family: 'Space Mono', monospace;
+  transition: opacity 0.2s;
+}
+.section-link:hover { opacity: 0.7; text-decoration: underline; }
+
+/* ============================================================
+   COURSE CARDS
+   ============================================================ */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.course-card {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  transition: all 0.25s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp 0.5s 0.2s both;
+}
+.course-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--card-line, var(--cyan));
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.course-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: var(--border2); }
+.course-card:hover::before { opacity: 1; }
+
+.course-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.course-code {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  padding: 3px 9px;
+  border-radius: 4px;
+  background: var(--surface2);
+  color: var(--cyan);
+  border: 1px solid var(--border2);
+  letter-spacing: 0.05em;
+}
+.course-badge {
+  font-size: 0.65rem;
+  font-family: 'Space Mono', monospace;
+  padding: 3px 8px;
+  border-radius: 3px;
+  background: var(--green-dim);
+  color: var(--green);
+  border: 1px solid rgba(0,255,136,0.2);
+}
+.course-title { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+.course-instructor { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px; }
+
+.progress-bar {
+  height: 4px;
+  background: var(--surface2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--green));
+  border-radius: 4px;
+  transition: width 1s ease;
+  box-shadow: 0 0 8px var(--cyan-dim);
+}
+.course-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  font-family: 'Space Mono', monospace;
+}
+.course-level {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 3px 9px;
+  border-radius: 4px;
+}
+
+/* ============================================================
+   RIGHT PANEL — INSIGHTS
+   ============================================================ */
+.insights-box {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.insights-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--cyan);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.insights-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+
+.insight-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s;
+}
+.insight-row:hover { border-color: var(--border2); }
+.insight-icon {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.insight-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 2px; font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.05em; }
+.insight-value { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+
+/* SYSTEM STATUS */
+.system-box {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.system-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--green);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.system-body { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+.system-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+.sys-badge {
+  display: flex; align-items: center; gap: 5px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 0.65rem;
+}
+.sys-badge.active { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,255,136,0.2); }
+.sys-badge.running { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(0,245,255,0.2); }
+.sys-badge i { font-size: 0.5rem; }
+
+/* ACTIVITY HEATMAP MINI */
+.activity-box {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.activity-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--orange);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.activity-body { padding: 16px 18px; }
+.heatmap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.heat-cell {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background: var(--surface2);
+  transition: all 0.2s;
+}
+.heat-cell:hover { transform: scale(1.3); }
+.heat-1 { background: rgba(0,245,255,0.15); }
+.heat-2 { background: rgba(0,245,255,0.35); }
+.heat-3 { background: rgba(0,245,255,0.60); }
+.heat-4 { background: var(--cyan); box-shadow: 0 0 6px var(--cyan-glow); }
+[data-theme="light"] .heat-1 { background: rgba(0,119,204,0.15); }
+[data-theme="light"] .heat-2 { background: rgba(0,119,204,0.35); }
+[data-theme="light"] .heat-3 { background: rgba(0,119,204,0.60); }
+[data-theme="light"] .heat-4 { background: var(--cyan); }
+.heat-legend { display: flex; align-items: center; gap: 4px; margin-top: 10px; font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--text-muted); }
+.heat-legend-cells { display: flex; gap: 3px; margin-left: auto; }
+.heat-legend-cell { width: 10px; height: 10px; border-radius: 2px; }
+
+/* ============================================================
+   QUICK ACTIONS BAR
+   ============================================================ */
+.quick-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.qa-btn {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.qa-btn i { font-size: 1rem; }
+.qa-btn:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); transform: translateY(-2px); }
+.qa-btn.quiz-btn:hover  { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.qa-btn.code-btn:hover  { border-color: var(--orange); color: var(--orange); background: var(--orange-dim); }
+
+/* ============================================================
+   VIEWS (HIDDEN)
+   ============================================================ */
+.hidden { display: none !important; }
+
+/* ============================================================
+   QUIZ VIEW
+   ============================================================ */
+.quiz-container {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 720px;
+  margin: 0 auto;
+  animation: fadeUp 0.4s both;
+}
+.quiz-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 8px;
+}
+.quiz-title::before { content: '//'; }
+
+.question-card {
+  background: var(--surface2);
+  padding: 26px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  border: 1px solid var(--border);
+}
+.question-number {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--cyan);
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.question-text { font-size: 1.1rem; font-weight: 600; line-height: 1.5; margin-bottom: 22px; }
+.options-list { display: flex; flex-direction: column; gap: 10px; }
+.option-btn {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  padding: 13px 18px;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+}
+.option-btn:hover { background: var(--cyan-dim); border-color: var(--cyan); color: var(--cyan); }
+.option-btn.selected { background: var(--cyan-dim); border-color: var(--cyan); color: var(--cyan); }
+.option-btn.correct  { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+.option-btn.incorrect{ background: rgba(255,95,87,0.12); border-color: #ff5f57; color: #ff5f57; }
+
+.explanation {
+  margin-top: 16px; padding: 16px 18px;
+  background: var(--cyan-dim);
+  border-left: 3px solid var(--cyan);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  display: none;
+}
+.explanation.show { display: block; }
+
+.quiz-actions { display: flex; justify-content: space-between; margin-top: 16px; gap: 12px; }
+
+/* RESULTS */
+.results-container { text-align: center; padding: 40px 20px; animation: fadeUp 0.4s both; }
+.results-score { font-size: 4rem; font-weight: 900; color: var(--cyan); margin: 20px 0; font-family: 'Space Mono', monospace; text-shadow: 0 0 30px var(--cyan-glow); }
+.results-message { font-size: 1.3rem; font-weight: 700; margin-bottom: 24px; }
+.results-stats { display: flex; justify-content: center; gap: 32px; margin: 24px 0; }
+.stat-box { text-align: center; }
+.stat-box h3 { font-size: 2.2rem; font-weight: 900; color: var(--cyan); font-family: 'Space Mono', monospace; }
+.stat-box p { font-size: 0.75rem; color: var(--text-muted); font-family: 'Space Mono', monospace; margin-top: 4px; }
+
+/* ============================================================
+   CODING VIEW
+   ============================================================ */
+.coding-wrap {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  animation: fadeUp 0.4s both;
+}
+.coding-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--orange);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 8px;
+}
+.coding-title::before { content: '//'; }
+.problem-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 18px 20px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+}
+.problem-box h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+.problem-box p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.6; }
+#editor { height: 360px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.ai-feedback {
+  background: var(--cyan-dim);
+  border-left: 3px solid var(--cyan);
+  padding: 18px 20px;
+  border-radius: 0 8px 8px 0;
+  margin-top: 18px;
+}
+.ai-feedback h4 { margin-bottom: 10px; font-family: 'Space Mono', monospace; font-size: 0.78rem; color: var(--cyan); letter-spacing: 0.05em; }
+#aiResponseText { white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 0.78rem; line-height: 1.6; color: var(--text-dim); }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+}
+.btn-primary {
+  background: var(--cyan);
+  color: #000;
+  box-shadow: 0 0 16px var(--cyan-glow);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 28px var(--cyan-glow); }
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--text-dim);
+}
+.btn-secondary:hover { border-color: var(--cyan); color: var(--cyan); }
+
+/* ============================================================
+   AUTH MODAL
+   ============================================================ */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: var(--modal-overlay);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: var(--card-bg);
+  border: 1px solid var(--border2);
+  padding: 40px;
+  border-radius: 18px;
+  max-width: 420px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: fadeUp 0.3s both;
+}
+.modal-top-line {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--green));
+  border-radius: 18px 18px 0 0;
+}
+.close-modal {
+  position: absolute;
+  top: 16px; right: 18px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.close-modal:hover { border-color: var(--cyan); color: var(--cyan); }
+.modal-header { margin-bottom: 28px; }
+.modal-header h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
+.modal-header p { color: var(--text-muted); font-size: 0.83rem; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; margin-bottom: 6px; font-size: 0.78rem; font-family: 'Space Mono', monospace; color: var(--text-dim); letter-spacing: 0.05em; }
+.form-group input {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.88rem;
+  outline: none;
+  transition: all 0.2s;
+}
+.form-group input:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px var(--cyan-dim); }
+.form-group input::placeholder { color: var(--text-muted); }
+.submit-btn {
+  width: 100%;
+  background: var(--cyan);
+  color: #000;
+  padding: 13px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  font-family: 'Space Mono', monospace;
+  cursor: pointer;
+  box-shadow: 0 0 20px var(--cyan-glow);
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+.submit-btn:hover { transform: translateY(-1px); box-shadow: 0 0 30px var(--cyan-glow); }
+.modal-switch { text-align: center; margin-top: 18px; color: var(--text-muted); font-size: 0.82rem; }
+.modal-switch a { color: var(--cyan); font-weight: 600; cursor: pointer; }
+.modal-switch a:hover { text-decoration: underline; }
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  grid-column: 1/-1;
+  border: 1px dashed var(--border2);
+  border-radius: 12px;
+}
+.empty-state i { font-size: 2rem; margin-bottom: 10px; display: block; color: var(--border2); }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="40" height="40" rx="9" fill="#040610"/>
+        <path d="M20 7C15.5 7 13 9 13 12v2.5h7V16H11C8.5 16 7 18 7 21s1.5 5 4 5h2v-3c0-2.5 2-4.5 4.5-4.5h5c2.2 0 4-1.8 4-4v-3.5C27.5 8.5 25 7 20 7z" fill="#4B8BBE"/>
+        <circle cx="17" cy="12" r="1.2" fill="#FFD43B"/>
+        <path d="M20 33c4.5 0 7-2 7-5v-2.5h-7V24h9c2.5 0 4-2 4-5s-1.5-5-4-5h-2v3c0 2.5-2 4.5-4.5 4.5h-5c-2.2 0-4 1.8-4 4V29c0 2.5 2.5 4 7 4z" fill="#FFD43B"/>
+        <circle cx="23" cy="28" r="1.2" fill="#4B8BBE"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">EduPortal</div>
+      <div class="logo-sub">// v2.0</div>
+    </div>
+  </div>
+
+  <div class="nav-section-label">Main</div>
+  <nav>
+    <ul>
+      <li><a href="#" class="menu-item active" id="dashboardBtn"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+      <li><a href="/practice_arena.html" class="menu-item"><i class="fa-solid fa-dumbbell"></i> Practice Arena</a></li>
+      <li><a href="/battle_arena.html" class="menu-item"><i class="fa-solid fa-swords"></i> Battle Arena</a></li>
+    </ul>
+  </nav>
+
+  <div class="nav-section-label" style="margin-top:8px">Learn</div>
+  <nav>
+    <ul>
+      <li><a href="/courses.html" class="menu-item"><i class="fa-solid fa-book-open"></i> My Courses</a></li>
+      <li><a href="#" class="menu-item"><i class="fa-solid fa-chart-line"></i> Progress</a></li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="logout" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</div>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="main-content">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="search-bar">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="searchInput" placeholder="Search courses, topics...">
+    </div>
+
+    <div class="header-right">
+      <div class="live-status"><div class="live-dot"></div>LIVE</div>
+
+      <!-- THEME TOGGLE -->
+      <div class="theme-toggle" id="themeToggle" title="Toggle Light/Dark Mode">
+        <span class="toggle-icon" id="toggleIcon">🌙</span>
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        <span id="toggleLabel" style="font-size:0.72rem;">Dark</span>
+      </div>
+
+      <div class="notif-btn"><i class="fa-solid fa-bell"></i><div class="notif-dot"></div></div>
+
+      <div class="user-profile" id="userProfileBtn">
+        <div class="avatar" id="userAvatar">JD</div>
+        <div>
+          <div class="user-info-text" id="userName">John Doe</div>
+          <div class="user-role-text" id="userRole">// student</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- DASHBOARD BODY -->
+  <div class="dashboard-body">
+    <div class="center-panel">
+
+      <!-- ========== DASHBOARD VIEW ========== -->
+      <div id="dashboardView">
+
+        <!-- WELCOME BANNER -->
+        <div class="welcome-banner">
+          <div>
+            <div class="welcome-eyebrow">Good to see you</div>
+            <h1>Welcome back, <span id="welcomeName">John</span>!</h1>
+            <p>Track your progress, take quizzes, and keep the streak alive.</p>
+          </div>
+          <button class="welcome-cta" onclick="showView('quiz')">▶ Take a Quiz</button>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon-box"><i class="fa-solid fa-book-open"></i></div>
+            <div class="stat-info">
+              <h3 id="enrolledCoursesCount">0</h3>
+              <span>ENROLLED</span>
+              <div class="stat-delta delta-up">↑ 2 new</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-box"><i class="fa-solid fa-trophy"></i></div>
+            <div class="stat-info">
+              <h3 id="quizzesCompletedCount">0</h3>
+              <span>QUIZZES DONE</span>
+              <div class="stat-delta delta-up">↑ 5 this week</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-box"><i class="fa-solid fa-fire"></i></div>
+            <div class="stat-info">
+              <h3 id="averageScore">0%</h3>
+              <span>AVG SCORE</span>
+              <div class="stat-delta delta-down">↓ 3% vs last</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="quick-actions">
+          <button class="qa-btn quiz-btn" onclick="showView('quiz')">
+            <i class="fa-solid fa-brain"></i> Quick Quiz
+          </button>
+          <button class="qa-btn code-btn" onclick="showView('coding')">
+            <i class="fa-solid fa-terminal"></i> Coding Challenge
+          </button>
+          <button class="qa-btn" onclick="window.location='/courses.html'">
+            <i class="fa-solid fa-compass"></i> Browse Courses
+          </button>
+        </div>
+
+        <!-- COURSES -->
+        <div class="section-header">
+          <h3>My Courses</h3>
+          <a href="/courses.html" class="section-link">View All →</a>
+        </div>
+        <div class="courses-grid" id="coursesGrid">
+          <div class="empty-state">
+            <i class="fa-solid fa-box-open"></i>
+            No courses enrolled yet.<br>Visit the courses page to enroll!
+          </div>
+        </div>
+
+      </div>
+      <!-- ========== END DASHBOARD ========== -->
+
+      <!-- ========== QUIZ VIEW ========== -->
+      <div id="quizView" class="hidden">
+        <div class="quiz-container" id="quizContainerBox">
+          <div class="quiz-title">Quiz Challenge</div>
+          <div class="question-card" id="questionCard">
+            <div class="question-number" id="questionNumber"></div>
+            <div class="question-text" id="questionText"></div>
+            <div class="options-list" id="optionsList"></div>
+            <div class="explanation" id="explanation">
+              <b style="font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--cyan)">// Explanation</b>
+              <p id="explanationText" style="margin-top:6px;"></p>
+            </div>
+          </div>
+          <div class="quiz-actions">
+            <button class="btn btn-secondary" id="backBtn" style="visibility:hidden"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <button class="btn btn-primary" id="nextBtn">Next <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <div class="results-container hidden" id="resultsView">
+          <div style="font-size:3rem;margin-bottom:10px;">🏆</div>
+          <div class="results-score" id="finalScore">0/5</div>
+          <div class="results-message" id="resultsMessage">Great job!</div>
+          <div class="results-stats">
+            <div class="stat-box"><h3 id="correctCount">0</h3><p>Correct</p></div>
+            <div class="stat-box"><h3 id="wrongCount">0</h3><p>Wrong</p></div>
+            <div class="stat-box"><h3 id="percentScore">0%</h3><p>Score</p></div>
+          </div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
+            <button class="btn btn-primary" id="retakeBtn"><i class="fa-solid fa-rotate-right"></i> Retake Quiz</button>
+            <button class="btn btn-secondary" id="backToDashboardBtn"><i class="fa-solid fa-home"></i> Dashboard</button>
+          </div>
+        </div>
+      </div>
+      <!-- ========== END QUIZ ========== -->
+
+      <!-- ========== CODING VIEW ========== -->
+      <div id="codingView" class="hidden">
+        <div class="coding-wrap">
+          <div class="coding-title">Coding Challenge</div>
+          <div class="problem-box">
+            <h3>Problem: Fibonacci Sequence</h3>
+            <p>Write a function that calculates the nth Fibonacci number. The sequence starts with 0 and 1; each subsequent number is the sum of the previous two.</p>
+          </div>
+          <div id="editor"></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+            <button class="btn btn-primary" id="submitCodeBtn"><i class="fa-solid fa-gavel"></i> Submit to AI Judge</button>
+          </div>
+          <div id="aiFeedbackPanel" class="ai-feedback hidden">
+            <h4><i class="fa-solid fa-robot"></i> AI Judge Feedback</h4>
+            <pre id="aiResponseText"></pre>
+          </div>
+        </div>
+      </div>
+      <!-- ========== END CODING ========== -->
+
+    </div>
+
+    <!-- ========== RIGHT PANEL ========== -->
+    <aside class="right-panel">
+
+      <!-- AI Insights -->
+      <div class="insights-box">
+        <div class="insights-header"><i class="fa-solid fa-microchip"></i> AI Insights</div>
+        <div class="insights-body">
+          <div class="insight-row">
+            <div class="insight-icon" style="background:var(--cyan-dim);color:var(--cyan)"><i class="fa-solid fa-chart-simple"></i></div>
+            <div>
+              <div class="insight-label">Reading Level</div>
+              <div class="insight-value" id="readingLevel">Grade 8</div>
+            </div>
+          </div>
+          <div class="insight-row">
+            <div class="insight-icon" style="background:var(--green-dim);color:var(--green)"><i class="fa-solid fa-eye"></i></div>
+            <div>
+              <div class="insight-label">Visual Mode</div>
+              <div class="insight-value" id="visualPref">Normal Mode</div>
+            </div>
+          </div>
+          <div class="insight-row">
+            <div class="insight-icon" style="background:var(--orange-dim);color:var(--orange)"><i class="fa-solid fa-user-check"></i></div>
+            <div>
+              <div class="insight-label">Learning Pattern</div>
+              <div class="insight-value" id="learningPattern">Mixed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Status -->
+      <div class="system-box">
+        <div class="system-header"><i class="fa-solid fa-server"></i> System Status</div>
+        <div class="system-body">
+          <div class="system-row">
+            <span>AI Model</span>
+            <span class="sys-badge active"><i class="fa-solid fa-circle"></i> Active</span>
+          </div>
+          <div class="system-row">
+            <span>TTS Engine</span>
+            <span class="sys-badge running"><i class="fa-solid fa-circle"></i> Running</span>
+          </div>
+          <div class="system-row">
+            <span>Quiz Engine</span>
+            <span class="sys-badge active"><i class="fa-solid fa-circle"></i> Ready</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Heatmap -->
+      <div class="activity-box">
+        <div class="activity-header"><i class="fa-solid fa-fire"></i> Weekly Activity</div>
+        <div class="activity-body">
+          <div class="heatmap" id="heatmap"></div>
+          <div class="heat-legend">
+            Less
+            <div class="heat-legend-cells">
+              <div class="heat-legend-cell" style="background:var(--surface2)"></div>
+              <div class="heat-legend-cell heat-1"></div>
+              <div class="heat-legend-cell heat-2"></div>
+              <div class="heat-legend-cell heat-3"></div>
+              <div class="heat-legend-cell heat-4"></div>
+            </div>
+            More
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+</main>
+
+<!-- ============================================================
+     AUTH MODAL
+     ============================================================ -->
+<div class="modal-overlay hidden" id="authModal">
+  <div class="modal-content">
+    <div class="modal-top-line"></div>
+    <button class="close-modal" id="closeModal">✕</button>
+
+    <div id="loginFormContainer">
+      <div class="modal-header">
+        <h2>Login to EduPortal</h2>
+        <p>Enter your credentials to continue learning.</p>
+      </div>
+      <form id="loginForm">
+        <div class="form-group"><label>Student ID</label><input type="text" id="loginStudentId" placeholder="e.g. PEC20CS001" required></div>
+        <div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••" required></div>
+        <button type="submit" class="submit-btn">Login →</button>
+      </form>
+      <div class="modal-switch">Don't have an account? <a id="showRegisterBtn">Register here</a></div>
+    </div>
+
+    <div id="registerFormContainer" class="hidden">
+      <div class="modal-header">
+        <h2>Create Account</h2>
+        <p>Join EduPortal and start your learning journey.</p>
+      </div>
+      <form id="registerForm">
+        <div class="form-group"><label>Full Name</label><input type="text" id="registerName" placeholder="John Doe" required></div>
+        <div class="form-group"><label>Student ID</label><input type="text" id="registerStudentId" placeholder="PEC20CS001" required></div>
+        <div class="form-group"><label>Email</label><input type="email" id="registerEmail" placeholder="john@example.com" required></div>
+        <div class="form-group"><label>Password</label><input type="password" id="registerPassword" placeholder="••••••••" required minlength="6"></div>
+        <div class="form-group"><label>Confirm Password</label><input type="password" id="registerConfirmPassword" placeholder="••••••••" required minlength="6"></div>
+        <button type="submit" class="submit-btn">Create Account →</button>
+      </form>
+      <div class="modal-switch">Already have an account? <a id="showLoginBtn">Login here</a></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// THEME TOGGLE
+// ============================================================
+const html = document.documentElement;
+const themeToggle = document.getElementById('themeToggle');
+const toggleIcon  = document.getElementById('toggleIcon');
+const toggleLabel = document.getElementById('toggleLabel');
+
+let isDark = true;
+
+themeToggle.addEventListener('click', () => {
+  isDark = !isDark;
+  html.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  toggleIcon.textContent  = isDark ? '🌙' : '☀️';
+  toggleLabel.textContent = isDark ? 'Dark' : 'Light';
+  // re-tint monaco if loaded
+  if (typeof monaco !== 'undefined' && editor) {
+    monaco.editor.setTheme(isDark ? 'vs-dark' : 'vs');
+  }
+});
+
+// ============================================================
+// HEATMAP
+// ============================================================
+function buildHeatmap() {
+  const map = document.getElementById('heatmap');
+  const levels = [0,1,0,2,3,4,2,1,0,3,4,4,2,1,0,1,2,3,1,0,2,3,4,2,1,0,1,2];
+  map.innerHTML = levels.map(l => `<div class="heat-cell ${l ? 'heat-'+l : ''}"></div>`).join('');
+}
+buildHeatmap();
+
+// ============================================================
+// API & STATE
+// ============================================================
+// ============================================================
+// LOCAL AUTH & DATA — No backend required
+// ============================================================
+let currentUser = null;
+let monacoEditor;
+let quizQuestions = [], currentQuestionIndex = 0, userAnswers = {};
+
+const dashboardView    = document.getElementById('dashboardView');
+const quizView         = document.getElementById('quizView');
+const codingView       = document.getElementById('codingView');
+const resultsView      = document.getElementById('resultsView');
+const authModal        = document.getElementById('authModal');
+const loginFormCont    = document.getElementById('loginFormContainer');
+const registerFormCont = document.getElementById('registerFormContainer');
+
+// ---------- localStorage helpers ----------
+function getUsers()    { return JSON.parse(localStorage.getItem('edu_users')  || '{}'); }
+function saveUsers(u)  { localStorage.setItem('edu_users', JSON.stringify(u)); }
+function getSession()  { return JSON.parse(localStorage.getItem('edu_session') || 'null'); }
+function saveSession(u){ localStorage.setItem('edu_session', JSON.stringify(u)); }
+function clearSession(){ localStorage.removeItem('edu_session'); }
+
+// ---------- DEMO COURSES ----------
+const demoCourses = [
+  { code:'CS101', title:'Basic Python',         instructor:'Prof. Ananya Rao',     level:'Beginner',     progress:68 },
+  { code:'CS201', title:'Advanced Python',      instructor:'Prof. Ananya Rao',     level:'Intermediate', progress:34 },
+  { code:'MA101', title:'Calculus',             instructor:'Prof. Divya Krishnan', level:'Beginner',     progress:52 },
+  { code:'PH101', title:'Quantum & EM Physics', instructor:'Prof. Vikram Nair',    level:'Advanced',     progress:20 },
+];
+
+// ---------- DEMO QUIZ ----------
+const demoQuiz = [
+  { id:1, question:"What is the output of: print(type(42))?",
+    options:{ A:"<class 'int'>", B:"<class 'str'>", C:"<class 'float'>", D:"<class 'num'>" },
+    correct:'A', explanation:"42 is an integer literal. type() returns the class of the object." },
+  { id:2, question:"Which keyword defines a function in Python?",
+    options:{ A:'function', B:'define', C:'def', D:'func' },
+    correct:'C', explanation:"In Python, 'def' is used to declare a function." },
+  { id:3, question:"What does len([1, 2, 3, 4]) return?",
+    options:{ A:'3', B:'4', C:'5', D:'Error' },
+    correct:'B', explanation:"len() returns the number of items. The list has 4 elements." },
+  { id:4, question:"Which creates an empty dictionary?",
+    options:{ A:'[]', B:'()', C:'{}', D:'<>' },
+    correct:'C', explanation:"Curly braces {} create an empty dict. [] is list, () is tuple." },
+  { id:5, question:"What is the result of 2 ** 8 in Python?",
+    options:{ A:'16', B:'64', C:'256', D:'512' },
+    correct:'C', explanation:"** is the exponentiation operator. 2^8 = 256." },
+];
+
+// ---------- TOAST ----------
+function showToast(msg, type='success') {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.style.cssText = [
+    'position:fixed','bottom:28px','right:28px','z-index:9999',
+    'background:var(--card-bg)',
+    'border:1px solid ' + (type==='error' ? 'var(--orange)' : 'var(--cyan)'),
+    'color:' + (type==='error' ? 'var(--orange)' : 'var(--cyan)'),
+    'padding:12px 20px','border-radius:10px',
+    "font-family:'Space Mono',monospace",
+    'font-size:0.78rem','box-shadow:0 8px 32px rgba(0,0,0,0.4)',
+    'max-width:320px','line-height:1.5','transition:opacity 0.4s'
+  ].join(';');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; }, 2800);
+  setTimeout(() => t.remove(), 3300);
+}
+
+// ---------- AUTH ----------
+function login(studentId, password) {
+  const users = getUsers();
+  const user  = users[studentId];
+  if (!user)                  { showToast('No account found with that Student ID.', 'error'); return; }
+  if (user.password !== password) { showToast('Incorrect password. Try again.', 'error'); return; }
+  currentUser = { ...user };
+  delete currentUser.password;
+  saveSession(currentUser);
+  authModal.classList.add('hidden');
+  loadDashboard();
+  showToast('Welcome back, ' + currentUser.name.split(' ')[0] + '! 👋', 'success');
+}
+
+function register(name, studentId, email, password) {
+  const users = getUsers();
+  if (users[studentId]) { showToast('A user with this Student ID already exists.', 'error'); return; }
+  const newUser = {
+    name, student_id: studentId, email, password,
+    reading_level: 'Grade 8', visual_preference: 'Normal Mode', learning_pattern: 'Mixed',
+    enrolled_courses: 4, quizzes_completed: 0, average_score: 0,
+  };
+  users[studentId] = newUser;
+  saveUsers(users);
+  currentUser = { ...newUser };
+  delete currentUser.password;
+  saveSession(currentUser);
+  authModal.classList.add('hidden');
+  loadDashboard();
+  showToast('Account created! Welcome, ' + name.split(' ')[0] + '! 🎉', 'success');
+}
+
+// ---------- DASHBOARD ----------
+function loadDashboard() {
+  if (!currentUser) return;
+  document.getElementById('userName').textContent      = currentUser.name;
+  document.getElementById('welcomeName').textContent   = currentUser.name.split(' ')[0];
+  document.getElementById('userAvatar').textContent    = currentUser.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('enrolledCoursesCount').textContent = currentUser.enrolled_courses || demoCourses.length;
+  document.getElementById('quizzesCompletedCount').textContent = currentUser.quizzes_completed || 0;
+  document.getElementById('averageScore').textContent  = (currentUser.average_score || 0) + '%';
+  document.getElementById('readingLevel').textContent  = currentUser.reading_level;
+  document.getElementById('visualPref').textContent    = currentUser.visual_preference;
+  document.getElementById('learningPattern').textContent = currentUser.learning_pattern;
+  loadCourses(demoCourses);
+}
+
+function loadCourses(courses) {
+  const grid = document.getElementById('coursesGrid');
+  const colors = ['--cyan','--green','--orange','--pink'];
+  grid.innerHTML = courses.map((c,i) => '<div class="course-card" style="--card-line:var(' + colors[i%4] + ')">'
+    + '<div class="course-header"><div class="course-code">' + c.code + '</div><div class="course-badge">Active</div></div>'
+    + '<div class="course-title">' + c.title + '</div>'
+    + '<div class="course-instructor"><i class="fa-solid fa-user" style="font-size:0.7rem;margin-right:4px;"></i>' + c.instructor + '</div>'
+    + '<div class="progress-bar"><div class="progress-fill" style="width:' + c.progress + '%"></div></div>'
+    + '<div class="course-footer"><div class="course-level">' + c.level + '</div><span>' + c.progress + '% done</span></div>'
+    + '</div>').join('');
+}
+
+// ---------- QUIZ (local) ----------
+function loadQuiz() {
+  quizQuestions = demoQuiz;
+  currentQuestionIndex = 0;
+  userAnswers = {};
+  displayQuestion();
+}
+
+function displayQuestion() {
+  if (currentQuestionIndex >= quizQuestions.length) { submitQuiz(); return; }
+  const q = quizQuestions[currentQuestionIndex];
+  document.getElementById('questionNumber').textContent = 'Question ' + (currentQuestionIndex+1) + ' / ' + quizQuestions.length;
+  document.getElementById('questionText').textContent = q.question;
+  const list = document.getElementById('optionsList');
+  list.innerHTML = '';
+  Object.entries(q.options).forEach(([key, val]) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = key + '. ' + val;
+    btn.onclick = () => {
+      document.querySelectorAll('.option-btn').forEach(b => { b.classList.remove('selected','correct','incorrect'); b.disabled = false; });
+      userAnswers[q.id] = key;
+      // Show correct/incorrect immediately
+      document.querySelectorAll('.option-btn').forEach(b => {
+        const k = b.textContent.charAt(0);
+        if (k === q.correct) b.classList.add('correct');
+        else if (k === key && key !== q.correct) b.classList.add('incorrect');
+        b.disabled = true;
+      });
+      document.getElementById('explanationText').textContent = q.explanation;
+      document.getElementById('explanation').classList.add('show');
+    };
+    list.appendChild(btn);
+  });
+  document.getElementById('explanation').classList.remove('show');
+  document.getElementById('backBtn').style.visibility = currentQuestionIndex > 0 ? 'visible' : 'hidden';
+}
+
+function submitQuiz() {
+  let score = 0;
+  demoQuiz.forEach(q => { if (userAnswers[q.id] === q.correct) score++; });
+  const total = demoQuiz.length;
+  const pct = Math.round((score / total) * 100);
+  // update user stats
+  if (currentUser) {
+    currentUser.quizzes_completed = (currentUser.quizzes_completed || 0) + 1;
+    currentUser.average_score = pct;
+    const users = getUsers();
+    if (users[currentUser.student_id]) {
+      users[currentUser.student_id].quizzes_completed = currentUser.quizzes_completed;
+      users[currentUser.student_id].average_score = pct;
+      saveUsers(users);
+    }
+    saveSession(currentUser);
+    document.getElementById('quizzesCompletedCount').textContent = currentUser.quizzes_completed;
+    document.getElementById('averageScore').textContent = pct + '%';
+  }
+  showResults({ score, total, percentage: pct });
+}
+
+function showResults(result) {
+  document.getElementById('quizContainerBox').classList.add('hidden');
+  resultsView.classList.remove('hidden');
+  document.getElementById('finalScore').textContent = `${result.score}/${result.total}`;
+  document.getElementById('correctCount').textContent = result.score;
+  document.getElementById('wrongCount').textContent = result.total - result.score;
+  document.getElementById('percentScore').textContent = result.percentage + '%';
+  document.getElementById('resultsMessage').textContent = result.percentage >= 80 ? 'Excellent work! 🎉' : result.percentage >= 60 ? 'Good job! Keep it up! 👍' : 'Keep practicing! 💪';
+}
+
+// Monaco
+require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs' } });
+function initMonaco() {
+  if (!monacoEditor) {
+    require(['vs/editor/editor.main'], () => {
+      monacoEditor = monaco.editor.create(document.getElementById('editor'), {
+        value: "def fibonacci(n):\n    # Your code here\n    pass\n\n# Test your function\nprint(fibonacci(10))",
+        language: 'python',
+        theme: isDark ? 'vs-dark' : 'vs',
+        automaticLayout: true,
+        fontSize: 13,
+        fontFamily: "'Space Mono', monospace",
+        minimap: { enabled: false }
+      });
+    });
+  }
+}
+
+function submitCode() {
+  const btn = document.getElementById('submitCodeBtn');
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Judging...';
+  btn.disabled = true;
+  setTimeout(() => {
+    const code = monacoEditor ? monacoEditor.getValue() : '';
+    const hasFib = code.includes('fibonacci') || code.includes('fib');
+    const hasReturn = code.includes('return');
+    const feedback = hasFib && hasReturn
+      ? "✅ Function detected.\n✅ Return statement found.\n\nAI Analysis:\nYour code looks structurally correct! Make sure to handle base cases (n=0 → 0, n=1 → 1) and test edge cases like fibonacci(0) and fibonacci(1)."
+      : "⚠️ No fibonacci function with return found.\n\nAI Analysis:\nMake sure your function is named 'fibonacci', accepts one parameter 'n', and returns the result rather than just printing it.";
+    document.getElementById('aiFeedbackPanel').classList.remove('hidden');
+    document.getElementById('aiResponseText').textContent = feedback;
+    btn.innerHTML = '<i class="fa-solid fa-gavel"></i> Submit to AI Judge';
+    btn.disabled = false;
+  }, 1200);
+}
+
+// Views
+function showView(view) {
+  dashboardView.classList.add('hidden');
+  quizView.classList.add('hidden');
+  codingView.classList.add('hidden');
+  document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active'));
+
+  if (view === 'dashboard') {
+    dashboardView.classList.remove('hidden');
+    document.getElementById('dashboardBtn').classList.add('active');
+  } else if (view === 'quiz') {
+    quizView.classList.remove('hidden');
+    resultsView.classList.add('hidden');
+    document.getElementById('quizContainerBox').classList.remove('hidden');
+    document.getElementById('quizBtn').classList.add('active');
+    loadQuiz();
+  } else if (view === 'coding') {
+    codingView.classList.remove('hidden');
+    document.getElementById('codingBattleBtn').classList.add('active');
+    initMonaco();
+  }
+}
+
+function showAuthModal() {
+  authModal.classList.remove('hidden');
+  loginFormCont.classList.remove('hidden');
+  registerFormCont.classList.add('hidden');
+}
+
+// Events
+document.getElementById('dashboardBtn').addEventListener('click', e=>{e.preventDefault();showView('dashboard');});
+document.getElementById('quizBtn').addEventListener('click', e=>{e.preventDefault();showView('quiz');});
+document.getElementById('codingBattleBtn').addEventListener('click', e=>{e.preventDefault();showView('coding');});
+document.getElementById('closeModal').addEventListener('click', ()=>{if(authToken) authModal.classList.add('hidden');});
+document.getElementById('loginForm').addEventListener('submit', async e=>{e.preventDefault();login(document.getElementById('loginStudentId').value, document.getElementById('loginPassword').value);});
+document.getElementById('registerForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const p = document.getElementById('registerPassword').value;
+  const cp = document.getElementById('registerConfirmPassword').value;
+  if (p !== cp) { alert('Passwords do not match!'); return; }
+  if (p.length < 6) { alert('Password must be at least 6 characters!'); return; }
+  register(document.getElementById('registerName').value, document.getElementById('registerStudentId').value, document.getElementById('registerEmail').value, p);
+});
+document.getElementById('showRegisterBtn').addEventListener('click', e=>{e.preventDefault();loginFormCont.classList.add('hidden');registerFormCont.classList.remove('hidden');});
+document.getElementById('showLoginBtn').addEventListener('click', e=>{e.preventDefault();registerFormCont.classList.add('hidden');loginFormCont.classList.remove('hidden');});
+document.getElementById('nextBtn').addEventListener('click', ()=>{currentQuestionIndex++;displayQuestion();});
+document.getElementById('backBtn').addEventListener('click', ()=>{currentQuestionIndex--;displayQuestion();});
+document.getElementById('retakeBtn').addEventListener('click', ()=>showView('quiz'));
+document.getElementById('backToDashboardBtn').addEventListener('click', ()=>showView('dashboard'));
+document.getElementById('submitCodeBtn').addEventListener('click', submitCode);
+document.getElementById('logoutBtn').addEventListener('click', ()=>{clearSession();currentUser=null;showView('dashboard');showAuthModal();});
+
+// Init
+window.addEventListener('load', () => {
+  const session = getSession();
+  if (session) {
+    currentUser = session;
+    loadDashboard();
+  } else {
+    showAuthModal();
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduPortal — Learn & Code</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #040610;
+  --surface: #080d1a;
+  --surface2: #0d1525;
+  --border: #1a2540;
+  --border2: #243060;
+  --cyan: #00f5ff;
+  --cyan-dim: rgba(0,245,255,0.12);
+  --cyan-glow: rgba(0,245,255,0.35);
+  --green: #00ff88;
+  --green-dim: rgba(0,255,136,0.1);
+  --orange: #ff6b35;
+  --orange-dim: rgba(255,107,53,0.12);
+  --yellow: #ffd60a;
+  --pink: #ff3cac;
+  --text: #e8f4ff;
+  --text-muted: #4a6080;
+  --text-dim: #8aa0c0;
+  --grid-color: rgba(0,245,255,0.04);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* GRID BACKGROUND */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* AMBIENT GLOW ORBS */
+body::after {
+  content: '';
+  position: fixed;
+  top: -200px; right: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(0,245,255,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============================================================
+   PAGES
+   ============================================================ */
+.page { display: none; min-height: 100vh; position: relative; z-index: 1; }
+.page.active { display: block; animation: pageIn 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   TOPBAR
+   ============================================================ */
+.topbar {
+  background: rgba(4,6,16,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* LOGO */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.logo-icon {
+  width: 36px; height: 36px;
+  position: relative;
+  flex-shrink: 0;
+}
+.logo-icon svg { width: 100%; height: 100%; }
+.logo-text {
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--cyan);
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 20px var(--cyan-glow);
+}
+.logo-text em {
+  color: var(--text-dim);
+  font-style: normal;
+  font-size: 0.75rem;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-family: 'Space Mono', monospace;
+}
+.breadcrumb .crumb { color: var(--cyan); cursor: pointer; transition: opacity 0.2s; }
+.breadcrumb .crumb:hover { opacity: 0.7; text-decoration: underline; }
+.breadcrumb .sep { color: var(--border2); }
+
+.back-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--text-dim);
+  padding: 7px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Space Mono', monospace;
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+.back-btn:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); }
+
+/* TOPBAR STATUS DOTS */
+.status-row {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.status-dot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: 'Space Mono', monospace;
+}
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+/* ============================================================
+   PAGE 1: COURSES
+   ============================================================ */
+.courses-header {
+  padding: 56px 48px 32px;
+  position: relative;
+}
+.courses-header .eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--cyan);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.courses-header .eyebrow::before {
+  content: '';
+  width: 30px; height: 1px;
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+}
+.courses-header h1 {
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.courses-header h1 span {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--cyan);
+  text-shadow: 0 0 40px var(--cyan-glow);
+}
+.courses-header p {
+  color: var(--text-dim);
+  margin-top: 10px;
+  font-size: 1rem;
+}
+
+/* FILTER BAR */
+.filter-bar {
+  padding: 0 48px 28px;
+  display: flex;
+  gap: 8px;
+}
+.filter-btn {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--text-muted);
+  padding: 7px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-family: 'Space Mono', monospace;
+  transition: all 0.2s;
+  letter-spacing: 0.05em;
+}
+.filter-btn:hover, .filter-btn.active {
+  background: var(--cyan-dim);
+  border-color: var(--cyan);
+  color: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan-dim);
+}
+
+/* COURSES GRID */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 0 48px 80px;
+}
+
+.course-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 26px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Accent line top */
+.course-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--card-accent, var(--cyan));
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: 0 0 20px var(--card-accent, var(--cyan));
+}
+/* Corner glow */
+.course-card::after {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, var(--card-glow, var(--cyan-dim)) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.course-card:hover {
+  border-color: var(--card-accent, var(--cyan));
+  transform: translateY(-5px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px var(--card-glow, var(--cyan-dim));
+  background: var(--surface2);
+}
+.course-card:hover::before { opacity: 1; }
+.course-card:hover::after  { opacity: 1; }
+
+/* Card colors */
+.course-card[data-color="cyan"]   { --card-accent: var(--cyan);   --card-glow: var(--cyan-dim);   }
+.course-card[data-color="green"]  { --card-accent: var(--green);  --card-glow: var(--green-dim);  }
+.course-card[data-color="orange"] { --card-accent: var(--orange); --card-glow: var(--orange-dim); }
+.course-card[data-color="pink"]   { --card-accent: var(--pink);   --card-glow: rgba(255,60,172,0.12); }
+.course-card[data-color="yellow"] { --card-accent: var(--yellow); --card-glow: rgba(255,214,10,0.1); }
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.course-icon {
+  width: 48px; height: 48px;
+  border-radius: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  transition: all 0.3s;
+}
+.course-card:hover .course-icon {
+  border-color: var(--card-accent, var(--cyan));
+  box-shadow: 0 0 20px var(--card-glow, var(--cyan-dim));
+  background: rgba(0,245,255,0.05);
+}
+.course-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 3px 8px;
+  border-radius: 3px;
+}
+
+.course-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+.course-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--card-accent, var(--cyan));
+  background: var(--cyan-dim);
+  border: 1px solid rgba(0,245,255,0.15);
+  padding: 3px 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+/* CARD BOTTOM: progress bar flair */
+.card-footer {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: 'Space Mono', monospace;
+}
+.card-arrow {
+  color: var(--card-accent, var(--cyan));
+  font-size: 1rem;
+  transition: transform 0.2s;
+}
+.course-card:hover .card-arrow { transform: translateX(4px); }
+
+/* ============================================================
+   PAGE 2: COURSE DETAIL
+   ============================================================ */
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: calc(100vh - 60px);
+  overflow: hidden;
+}
+
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.sidebar-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sidebar-title .dot-cyan {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+}
+
+.sidebar label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+  margin-top: 24px;
+}
+.sidebar label:first-of-type { margin-top: 0; }
+
+.styled-select {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 13px 16px;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2300f5ff' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  transition: all 0.2s;
+}
+.styled-select:focus {
+  outline: none;
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 2px var(--cyan-dim), 0 0 20px var(--cyan-dim);
+}
+
+.confirm-btn {
+  margin-top: 36px;
+  width: 100%;
+  background: var(--cyan);
+  border: none;
+  color: #000;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  cursor: pointer;
+  transition: all 0.25s;
+  letter-spacing: 0.03em;
+  box-shadow: 0 0 30px var(--cyan-glow);
+  position: relative;
+  overflow: hidden;
+}
+.confirm-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.4s;
+}
+.confirm-btn:hover { transform: translateY(-2px); box-shadow: 0 0 50px var(--cyan-glow); }
+.confirm-btn:hover::before { transform: translateX(100%); }
+
+/* TEACHER CARD */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.teacher-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 48px;
+  position: relative;
+  overflow: hidden;
+}
+.teacher-card::before {
+  content: '';
+  position: absolute;
+  top: -100px; left: 50%;
+  transform: translateX(-50%);
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(0,255,136,0.05) 0%, transparent 70%);
+}
+
+.teacher-photo {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 2px solid var(--green);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3rem;
+  box-shadow: 0 0 40px rgba(0,255,136,0.25), inset 0 0 30px rgba(0,255,136,0.05);
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 1;
+}
+.teacher-ring {
+  position: absolute;
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,255,136,0.2);
+  animation: spin 8s linear infinite;
+}
+.teacher-ring2 {
+  position: absolute;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  border: 1px dashed rgba(0,255,136,0.1);
+  animation: spin 12s linear infinite reverse;
+}
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.teacher-name {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--text);
+  text-align: center;
+  position: relative; z-index: 1;
+}
+.teacher-sub {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 5px;
+  text-align: center;
+  font-family: 'Space Mono', monospace;
+  position: relative; z-index: 1;
+}
+.teacher-badge {
+  margin-top: 14px;
+  background: var(--green-dim);
+  border: 1px solid rgba(0,255,136,0.25);
+  color: var(--green);
+  font-size: 0.72rem;
+  padding: 5px 14px;
+  border-radius: 3px;
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 0.08em;
+  position: relative; z-index: 1;
+}
+
+
+
+/* ============================================================
+   PAGE 3: LESSON
+   ============================================================ */
+.lesson-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 60px);
+}
+
+.video-section {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 14px;
+  padding: 20px 20px 0;
+}
+
+.video-primary {
+  background: #000;
+  border-radius: 10px;
+  aspect-ratio: 16/9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border2);
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(0,0,0,0.6), 0 0 1px var(--cyan) inset;
+}
+.video-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(0,15,40,0.9) 0%, rgba(0,5,20,0.95) 100%);
+}
+.video-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,245,255,0.015) 2px,
+    rgba(0,245,255,0.015) 4px
+  );
+  pointer-events: none;
+}
+.play-icon {
+  position: relative; z-index: 2;
+  width: 64px; height: 64px;
+  background: var(--cyan);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  color: #000;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 0 40px var(--cyan-glow);
+}
+.play-icon:hover { transform: scale(1.1); box-shadow: 0 0 60px var(--cyan-glow); }
+.vid-label {
+  position: relative; z-index: 2;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--cyan);
+  opacity: 0.8;
+  letter-spacing: 0.05em;
+}
+.video-corner {
+  position: absolute;
+  top: 12px; left: 12px;
+  z-index: 3;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--green);
+  display: flex; align-items: center; gap: 6px;
+}
+.vid-live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 1.5s infinite;
+}
+
+/* VIDEO SIDEBAR */
+.video-sidebar { display: flex; flex-direction: column; gap: 12px; }
+.video-thumb {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.video-thumb:hover { border-color: var(--orange); background: var(--orange-dim); box-shadow: 0 0 20px rgba(255,107,53,0.1); }
+.thumb-icon { font-size: 2rem; }
+.thumb-title { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.thumb-sub { font-size: 0.7rem; color: var(--orange); font-family: 'Space Mono', monospace; }
+.thumb-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; }
+
+/* BOTTOM ROW */
+.bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 14px;
+  padding: 14px 20px 20px;
+  flex: 1;
+}
+
+/* CODE VIEWER (replaces FAQs heading but keeps FAQs) */
+.faq-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.faq-header {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+  font-family: 'Space Mono', monospace;
+  color: var(--cyan);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.05em;
+  background: var(--surface2);
+}
+.faq-tabs {
+  display: flex;
+  gap: 0;
+}
+.faq-tab {
+  padding: 10px 18px;
+  font-size: 0.78rem;
+  font-family: 'Space Mono', monospace;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  background: none;
+  border-left: none; border-right: none; border-top: none;
+  letter-spacing: 0.04em;
+}
+.faq-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+.faq-tab:hover { color: var(--text); }
+
+.faq-list {
+  padding: 12px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: 260px;
+}
+.faq-item {
+  padding: 14px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s;
+}
+.faq-item:hover { border-color: var(--border2); }
+.faq-q { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.faq-avatar {
+  width: 30px; height: 30px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  font-family: 'Space Mono', monospace;
+}
+.faq-body { flex: 1; }
+.faq-username { font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; font-family: 'Space Mono', monospace; }
+.faq-text { font-size: 0.82rem; color: var(--text-dim); line-height: 1.5; }
+.faq-answer {
+  margin-left: 40px;
+  padding: 10px 14px;
+  background: rgba(0,245,255,0.04);
+  border-left: 2px solid var(--cyan);
+  border-radius: 0 6px 6px 0;
+  font-size: 0.81rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.faq-upvote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.upvote-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-family: 'Space Mono', monospace;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 4px;
+}
+.upvote-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+/* DOWNLOAD SECTION */
+.dd-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.dd-header {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--green);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.dd-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Outfit', sans-serif;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dd-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+
+/* CODE PANEL */
+.code-panel {
+  display: none;
+  padding: 12px;
+  flex: 1;
+  overflow: hidden;
+  flex-direction: column;
+  gap: 8px;
+}
+.code-panel.visible { display: flex; }
+.code-editor-wrap {
+  background: #02050f;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.code-editor-bar {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+.dot-r { width:10px;height:10px;border-radius:50%;background:#ff5f57; }
+.dot-y { width:10px;height:10px;border-radius:50%;background:#febc2e; }
+.dot-g { width:10px;height:10px;border-radius:50%;background:#28c840; }
+.code-editor-bar span { margin-left: auto; }
+.code-textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #a8d8ff;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  padding: 16px;
+  resize: none;
+  outline: none;
+  line-height: 1.7;
+  min-height: 200px;
+}
+.run-btn {
+  background: var(--green);
+  border: none;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 0 20px rgba(0,255,136,0.3);
+  align-self: flex-end;
+}
+.run-btn:hover { box-shadow: 0 0 30px rgba(0,255,136,0.5); transform: translateY(-1px); }
+.code-output {
+  background: #02050f;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--green);
+  min-height: 60px;
+  white-space: pre-wrap;
+}
+
+/* FULLSCREEN BAR */
+.fullscreen-bar {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+.fullscreen-btn {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--text-dim);
+  padding: 9px 22px;
+  border-radius: 6px;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 0.78rem;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: all 0.2s;
+  letter-spacing: 0.04em;
+}
+.fullscreen-btn:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); box-shadow: 0 0 20px var(--cyan-dim); }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+
+/* HOVER STAGGER ANIMATION FOR CARDS */
+.courses-grid .course-card {
+  animation: cardIn 0.5s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     PAGE 1: COURSES LIST
+     ============================================================ -->
+<div class="page active" id="page-courses">
+  <div class="topbar">
+    <a class="logo" onclick="goTo('page-courses')" style="cursor:pointer">
+      <div class="logo-icon">
+        <!-- Python snake SVG logo -->
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="9" fill="#040610"/>
+          <rect width="40" height="40" rx="9" fill="url(#grad)" opacity="0.15"/>
+          <!-- Python logo inspired -->
+          <path d="M20 7C15.5 7 13 9 13 12v2.5h7V16H11C8.5 16 7 18 7 21s1.5 5 4 5h2v-3c0-2.5 2-4.5 4.5-4.5h5c2.2 0 4-1.8 4-4v-3.5C27.5 8.5 25 7 20 7z" fill="#4B8BBE"/>
+          <circle cx="17" cy="12" r="1.2" fill="#FFD43B"/>
+          <path d="M20 33c4.5 0 7-2 7-5v-2.5h-7V24h9c2.5 0 4-2 4-5s-1.5-5-4-5h-2v3c0 2.5-2 4.5-4.5 4.5h-5c-2.2 0-4 1.8-4 4V29c0 2.5 2.5 4 7 4z" fill="#FFD43B"/>
+          <circle cx="23" cy="28" r="1.2" fill="#4B8BBE"/>
+          <defs>
+            <linearGradient id="grad" x1="0" y1="0" x2="40" y2="40">
+              <stop offset="0%" stop-color="#00f5ff"/>
+              <stop offset="100%" stop-color="#00ff88"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="logo-text">EduPortal <em>// v2.0</em></div>
+    </a>
+    <div class="status-row">
+      <div class="status-dot"><div class="dot"></div> LIVE</div>
+    </div>
+  </div>
+
+  <div class="courses-header">
+    <div class="eyebrow">Course Library</div>
+    <h1>Learn Without <span>Limits</span></h1>
+    <p>Select a course and start your journey. Real problems. Real code. Real growth.</p>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCourses('all',this)">All</button>
+    <button class="filter-btn" onclick="filterCourses('Programming',this)">Programming</button>
+    <button class="filter-btn" onclick="filterCourses('Mathematics',this)">Mathematics</button>
+    <button class="filter-btn" onclick="filterCourses('Physics',this)">Physics</button>
+    <button class="filter-btn" onclick="filterCourses('Science',this)">Science</button>
+    <button class="filter-btn" onclick="filterCourses('Electronics',this)">Electronics</button>
+    <button class="filter-btn" onclick="filterCourses('Core Engg.',this)">Core Engg.</button>
+    <button class="filter-btn" onclick="filterCourses('Soft Skills',this)">Soft Skills</button>
+  </div>
+
+  <div class="courses-grid" id="courses-grid"></div>
+</div>
+
+<!-- ============================================================
+     PAGE 2: COURSE DETAIL
+     ============================================================ -->
+<div class="page" id="page-detail">
+  <div class="topbar">
+    <a class="logo" onclick="goTo('page-courses')" style="cursor:pointer">
+      <div class="logo-icon">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="9" fill="#040610"/>
+          <path d="M20 7C15.5 7 13 9 13 12v2.5h7V16H11C8.5 16 7 18 7 21s1.5 5 4 5h2v-3c0-2.5 2-4.5 4.5-4.5h5c2.2 0 4-1.8 4-4v-3.5C27.5 8.5 25 7 20 7z" fill="#4B8BBE"/>
+          <circle cx="17" cy="12" r="1.2" fill="#FFD43B"/>
+          <path d="M20 33c4.5 0 7-2 7-5v-2.5h-7V24h9c2.5 0 4-2 4-5s-1.5-5-4-5h-2v3c0 2.5-2 4.5-4.5 4.5h-5c-2.2 0-4 1.8-4 4V29c0 2.5 2.5 4 7 4z" fill="#FFD43B"/>
+          <circle cx="23" cy="28" r="1.2" fill="#4B8BBE"/>
+        </svg>
+      </div>
+      <div class="logo-text">EduPortal</div>
+    </a>
+    <div class="breadcrumb">
+      <span class="crumb" onclick="goTo('page-courses')">Courses</span>
+      <span class="sep">›</span>
+      <span id="breadcrumb-course" style="color:var(--text-dim)">Course</span>
+    </div>
+    <button class="back-btn" onclick="goTo('page-courses')">← Back</button>
+  </div>
+
+  <div class="detail-layout">
+    <div class="sidebar">
+      <div class="sidebar-title"><div class="dot-cyan"></div> Select Lesson</div>
+      <label>Chapter</label>
+      <select class="styled-select" id="chapter-select" onchange="loadTopics()">
+        <option value="">— Choose Chapter —</option>
+      </select>
+      <label>Topic</label>
+      <select class="styled-select" id="topic-select">
+        <option value="">— Choose Topic —</option>
+      </select>
+      <button class="confirm-btn" onclick="confirmLesson()">▶ Start Lesson</button>
+    </div>
+    <div class="main-content">
+      <div class="teacher-card">
+        <div class="teacher-ring"></div>
+        <div class="teacher-ring2"></div>
+        <div class="teacher-photo" id="teacher-photo">👩‍💻</div>
+        <div class="teacher-name" id="teacher-name">Prof. Name</div>
+        <div class="teacher-sub" id="teacher-sub">Department</div>
+        <div class="teacher-badge">// Course Instructor</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE 3: LESSON
+     ============================================================ -->
+<div class="page" id="page-lesson">
+  <div class="topbar">
+    <a class="logo" onclick="goTo('page-courses')" style="cursor:pointer">
+      <div class="logo-icon">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="9" fill="#040610"/>
+          <path d="M20 7C15.5 7 13 9 13 12v2.5h7V16H11C8.5 16 7 18 7 21s1.5 5 4 5h2v-3c0-2.5 2-4.5 4.5-4.5h5c2.2 0 4-1.8 4-4v-3.5C27.5 8.5 25 7 20 7z" fill="#4B8BBE"/>
+          <circle cx="17" cy="12" r="1.2" fill="#FFD43B"/>
+          <path d="M20 33c4.5 0 7-2 7-5v-2.5h-7V24h9c2.5 0 4-2 4-5s-1.5-5-4-5h-2v3c0 2.5-2 4.5-4.5 4.5h-5c-2.2 0-4 1.8-4 4V29c0 2.5 2.5 4 7 4z" fill="#FFD43B"/>
+          <circle cx="23" cy="28" r="1.2" fill="#4B8BBE"/>
+        </svg>
+      </div>
+      <div class="logo-text">EduPortal</div>
+    </a>
+    <div class="breadcrumb">
+      <span class="crumb" onclick="goTo('page-courses')">Courses</span>
+      <span class="sep">›</span>
+      <span class="crumb" onclick="goTo('page-detail')" id="bc-course2">Course</span>
+      <span class="sep">›</span>
+      <span id="bc-lesson" style="color:var(--text)">Lesson</span>
+    </div>
+    <button class="back-btn" onclick="goTo('page-detail')">← Back</button>
+  </div>
+
+  <div class="lesson-layout">
+    <div class="video-section">
+      <div class="video-primary">
+        <div class="video-scanlines"></div>
+        <div class="video-corner"><div class="vid-live-dot"></div> LIVE LESSON</div>
+        <div class="play-icon">▶</div>
+        <div class="vid-label" id="video-label">Select a topic to load video</div>
+      </div>
+      <div class="video-sidebar">
+        <div class="video-thumb">
+          <div class="thumb-icon">🎞️</div>
+          <div class="thumb-title">Animation Panel</div>
+          <div class="thumb-sub">// Visual Aid</div>
+          <div class="thumb-desc">Supplementary animation plays alongside the main lecture</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-row">
+      <!-- FAQ + Code Panel -->
+      <div class="faq-section">
+        <div style="display:flex; border-bottom:1px solid var(--border);">
+          <button class="faq-tab active" id="tab-faq" onclick="switchTab('faq')">💬 Discussions</button>
+          <button class="faq-tab" id="tab-code" onclick="switchTab('code')">⌨ Try It Live</button>
+        </div>
+
+        <!-- FAQs -->
+        <div id="panel-faq">
+          <div class="faq-list" id="faq-list"></div>
+        </div>
+
+        <!-- Code Editor -->
+        <div id="panel-code" class="code-panel">
+          <div class="code-editor-wrap">
+            <div class="code-editor-bar">
+              <div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div>
+              <span id="code-filename">main.py</span>
+            </div>
+            <textarea class="code-textarea" id="code-textarea" spellcheck="false"></textarea>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div style="font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--text-muted);">// Output</div>
+            <button class="run-btn" onclick="runCode()">▶ Run Code</button>
+          </div>
+          <div class="code-output" id="code-output">// Output will appear here...</div>
+        </div>
+      </div>
+
+      <!-- Downloads -->
+      <div class="dd-section">
+        <div class="dd-header">// Downloads</div>
+        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px;">Materials for this topic</div>
+        <button class="dd-btn">📄 Lecture Notes</button>
+        <button class="dd-btn">📊 Slides (PDF)</button>
+        <button class="dd-btn">📝 Practice Sheet</button>
+        <button class="dd-btn">🔗 References</button>
+      </div>
+    </div>
+
+    <div class="fullscreen-bar">
+      <button class="fullscreen-btn" onclick="toggleFS()">⛶ Fullscreen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const COLORS = ["cyan","green","orange","pink","yellow","cyan","green","orange","pink","cyan","green"];
+
+const courses = [
+  { id:1,  num:"01", title:"Basic Python",           icon:"🐍", tag:"Programming",  color:COLORS[0],
+    teacher:{ name:"Prof. Ananya Rao", sub:"Dept. of CSE", emoji:"👩‍💻" },
+    chapters:{
+      "Chapter 1 — Intro to Python":   ["Variables & Data Types","Input / Output","Operators"],
+      "Chapter 2 — Control Flow":      ["If-Else Conditions","For Loops","While Loops"],
+      "Chapter 3 — Functions":         ["Defining Functions","Arguments & Return","Lambda"],
+      "Chapter 4 — Data Structures":   ["Lists & Tuples","Dictionaries","Sets"],
+    },
+    codeSamples:{
+      "Variables & Data Types":`# Variables & Data Types in Python
+name = "Alice"
+age = 20
+gpa = 3.85
+is_enrolled = True
+
+print(f"Name   : {name}")
+print(f"Age    : {age}")
+print(f"GPA    : {gpa}")
+print(f"Active : {is_enrolled}")
+print(f"Type of age: {type(age)}")`,
+      "Input / Output":`# Input / Output
+name = input("Enter your name: ")
+year = int(input("Enter birth year: "))
+age  = 2025 - year
+print(f"Hello, {name}! You are approximately {age} years old.")`,
+      "For Loops":`# For Loops — Print multiplication table
+n = 5
+print(f"Multiplication table of {n}:")
+for i in range(1, 11):
+    print(f"  {n} × {i:2d} = {n*i:3d}")`,
+      "Lambda":`# Lambda Functions
+square = lambda x: x ** 2
+cube   = lambda x: x ** 3
+add    = lambda a, b: a + b
+
+nums = [1, 2, 3, 4, 5]
+squared = list(map(lambda x: x**2, nums))
+
+print("Squares:", squared)
+print("Cube of 4:", cube(4))
+print("Sum 7+3  :", add(7, 3))`,
+      "Lists & Tuples":`# Lists & Tuples
+fruits  = ["apple", "banana", "cherry"]
+coords  = (10.5, 20.3)   # tuple — immutable
+
+fruits.append("mango")
+fruits.sort()
+
+print("Fruits :", fruits)
+print("Coords :", coords)
+print("Slice  :", fruits[1:3])`,
+      "Dictionaries":`# Dictionaries
+student = {
+    "name"  : "Bob",
+    "grade" : "A",
+    "score" : 95
+}
+
+student["rank"] = 1
+
+for key, val in student.items():
+    print(f"  {key:8s}: {val}")`,
+    }
+  },
+  { id:2,  num:"02", title:"Communication Skills",   icon:"🗣️", tag:"Soft Skills",  color:COLORS[1],
+    teacher:{ name:"Prof. Rekha Menon",  sub:"Dept. of English", emoji:"👩‍🏫" },
+    chapters:{
+      "Chapter 1 — Verbal":   ["Public Speaking","Active Listening","Clarity"],
+      "Chapter 2 — Written":  ["Email Writing","Report Writing","Summarization"],
+      "Chapter 3 — Group":    ["Team Meetings","Conflict Resolution","Presentation"],
+    }, codeSamples:{}
+  },
+  { id:3,  num:"03", title:"Quantum & EM Physics",   icon:"⚛️", tag:"Physics",      color:COLORS[2],
+    teacher:{ name:"Prof. Vikram Nair",  sub:"Dept. of Physics", emoji:"👨‍🔬" },
+    chapters:{
+      "Chapter 1 — EM Waves":    ["Maxwell's Equations","Wave Propagation","Polarization"],
+      "Chapter 2 — Quantum":     ["Wave-Particle Duality","Schrödinger Eq.","Uncertainty"],
+      "Chapter 3 — QM":          ["Operators","Hydrogen Atom","Spin"],
+    }, codeSamples:{}
+  },
+  { id:4,  num:"04", title:"Mechanical Physics",     icon:"⚙️", tag:"Physics",      color:COLORS[3],
+    teacher:{ name:"Prof. Suresh Patel", sub:"Dept. of Physics", emoji:"👨‍🏫" },
+    chapters:{
+      "Chapter 1 — Newton":   ["Law of Motion","Free Body Diagrams","Friction"],
+      "Chapter 2 — Energy":   ["Work-Energy Theorem","Potential Energy","Conservation"],
+      "Chapter 3 — Rotation": ["Torque","Moment of Inertia","Angular Momentum"],
+    }, codeSamples:{}
+  },
+  { id:5,  num:"05", title:"IEEE",                   icon:"📡", tag:"Electronics",  color:COLORS[4],
+    teacher:{ name:"Prof. Kiran Shah",   sub:"Dept. of ECE",    emoji:"👨‍💼" },
+    chapters:{
+      "Chapter 1 — Standards": ["Overview","802.11","802.3"],
+      "Chapter 2 — Research":  ["Paper Structure","Citations","Peer Review"],
+      "Chapter 3 — Circuits":  ["Circuit Laws","Op-Amps","Filters"],
+    }, codeSamples:{}
+  },
+  { id:6,  num:"06", title:"Calculus",               icon:"∫",  tag:"Mathematics",  color:COLORS[5],
+    teacher:{ name:"Prof. Divya Krishnan",sub:"Dept. of Maths", emoji:"👩‍🔬" },
+    chapters:{
+      "Chapter 1 — Limits":   ["Concept of Limits","L'Hôpital's Rule","Continuity"],
+      "Chapter 2 — Diff.":    ["Derivatives","Chain Rule","Implicit Diff."],
+      "Chapter 3 — Integ.":   ["Indefinite Integrals","Definite Integrals","Applications"],
+      "Chapter 4 — Multi":    ["Partial Derivatives","Double Integrals","Gradient"],
+    }, codeSamples:{}
+  },
+  { id:7,  num:"07", title:"Linear Algebra & DEs",   icon:"🔢", tag:"Mathematics",  color:COLORS[6],
+    teacher:{ name:"Prof. Arjun Mehta",  sub:"Dept. of Maths",  emoji:"👨‍💻" },
+    chapters:{
+      "Chapter 1 — Matrices":  ["Matrix Operations","Determinants","Inverse"],
+      "Chapter 2 — Vectors":   ["Basis & Dimension","Eigenvalues","Diagonalization"],
+      "Chapter 3 — ODEs":      ["First Order DEs","Second Order DEs","Laplace Transforms"],
+    }, codeSamples:{}
+  },
+  { id:8,  num:"08", title:"Chemistry",              icon:"🧪", tag:"Science",      color:COLORS[7],
+    teacher:{ name:"Prof. Meena Iyer",   sub:"Dept. of Chemistry",emoji:"👩‍🔬" },
+    chapters:{
+      "Chapter 1 — Atomic":   ["Bohr's Model","Quantum Numbers","Periodic Table"],
+      "Chapter 2 — Bonding":  ["Ionic Bonds","Covalent Bonds","Hybridization"],
+      "Chapter 3 — Thermo":   ["Enthalpy","Entropy","Gibbs Free Energy"],
+    }, codeSamples:{}
+  },
+  { id:9,  num:"09", title:"Engineering Drawing",    icon:"📐", tag:"Core Engg.",   color:COLORS[8],
+    teacher:{ name:"Prof. Ravi Gupta",   sub:"Dept. of ME",     emoji:"👨‍🔧" },
+    chapters:{
+      "Chapter 1 — Basics":  ["Lines & Views","Orthographic","Isometric"],
+      "Chapter 2 — Sections":["Section Views","Hatching","Assembly"],
+      "Chapter 3 — CAD":     ["AutoCAD Basics","2D Drafting","Dimensioning"],
+    }, codeSamples:{}
+  },
+  { id:10, num:"10", title:"Mechatronics",           icon:"🤖", tag:"Core Engg.",   color:COLORS[9],
+    teacher:{ name:"Prof. Priya Jain",   sub:"Dept. of Mech",   emoji:"👩‍💼" },
+    chapters:{
+      "Chapter 1 — Sensors":  ["Types","Signal Conditioning","Calibration"],
+      "Chapter 2 — Actuators":["DC Motors","Servos","Pneumatics"],
+      "Chapter 3 — Control":  ["PID Control","Feedback","Stability"],
+    }, codeSamples:{}
+  },
+  { id:11, num:"11", title:"Advanced Python",        icon:"🔥", tag:"Programming",  color:COLORS[10],
+    teacher:{ name:"Prof. Ananya Rao",   sub:"Dept. of CSE",    emoji:"👩‍💻" },
+    chapters:{
+      "Chapter 1 — OOP":       ["Classes & Objects","Inheritance","Polymorphism"],
+      "Chapter 2 — Files":     ["Reading Files","Writing Files","JSON/CSV"],
+      "Chapter 3 — Libraries": ["NumPy","Pandas","Matplotlib"],
+      "Chapter 4 — Web":       ["Requests Library","REST APIs","Flask Basics"],
+    },
+    codeSamples:{
+      "Classes & Objects":`# Classes & Objects
+class Student:
+    university = "EduPortal University"
+
+    def __init__(self, name, gpa):
+        self.name = name
+        self.gpa  = gpa
+
+    def status(self):
+        return "Dean's List" if self.gpa >= 3.7 else "Regular"
+
+    def __repr__(self):
+        return f"Student({self.name}, GPA={self.gpa})"
+
+s1 = Student("Alice", 3.9)
+s2 = Student("Bob",   3.2)
+
+for s in [s1, s2]:
+    print(f"{s.name}: {s.status()} — {s}")`,
+      "Inheritance":`# Inheritance
+class Animal:
+    def __init__(self, name):
+        self.name = name
+    def speak(self):
+        return "..."
+
+class Dog(Animal):
+    def speak(self): return f"{self.name} says: Woof!"
+
+class Cat(Animal):
+    def speak(self): return f"{self.name} says: Meow!"
+
+animals = [Dog("Rex"), Cat("Whiskers"), Dog("Buddy")]
+for a in animals:
+    print(a.speak())`,
+      "NumPy":`# NumPy Basics
+import numpy as np
+
+arr  = np.array([1, 2, 3, 4, 5])
+mat  = np.arange(1, 10).reshape(3, 3)
+
+print("Array :", arr)
+print("Sum   :", arr.sum())
+print("Mean  :", arr.mean())
+print("Matrix:\\n", mat)
+print("Transpose:\\n", mat.T)`,
+    }
+  },
+];
+
+const faqs = [
+  { user:"Rahul K", color:"#00f5ff", q:"Why does Python use indentation instead of braces?", a:"Python uses indentation to enforce readability. Guido van Rossum's design decision makes code blocks visually obvious and forces clean style.", upvotes:42 },
+  { user:"Priya S", color:"#00ff88", q:"Difference between a list and a tuple?", a:"Lists are mutable; tuples are immutable and faster. Use tuples for fixed data — they can also be used as dictionary keys.", upvotes:31 },
+  { user:"Aman T", color:"#ff6b35", q:"How does the lambda function work?", a:"Lambda is an anonymous inline function. E.g. f = lambda x: x*2. Best for short throwaway operations passed to map/filter.", upvotes:18 },
+  { user:"Sneha R", color:"#ffd60a", q:"What is a virtual environment?", a:"A venv isolates project dependencies. Use `python -m venv env` to create one. Prevents version conflicts across projects.", upvotes:56 },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let currentCourse = null;
+let currentTopic  = null;
+let activeTab     = 'faq';
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goTo(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ============================================================
+// RENDER COURSES
+// ============================================================
+function renderCourses(filter='all') {
+  const grid = document.getElementById('courses-grid');
+  const filtered = filter === 'all' ? courses : courses.filter(c => c.tag === filter);
+
+  grid.innerHTML = filtered.map((c, i) => `
+    <div class="course-card" data-color="${c.color}" onclick="openCourse(${c.id})"
+         style="animation-delay:${i * 0.05}s">
+      <div class="card-top">
+        <div class="course-icon">${c.icon}</div>
+        <div class="course-num">// ${c.num}</div>
+      </div>
+      <div class="course-title">${c.title}</div>
+      <span class="course-tag">${c.tag}</span>
+      <div class="card-footer">
+        <span>${Object.keys(c.chapters).length} chapters</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterCourses(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCourses(cat);
+}
+
+// ============================================================
+// OPEN COURSE DETAIL
+// ============================================================
+function openCourse(id) {
+  currentCourse = courses.find(c => c.id === id);
+  if (!currentCourse) return;
+
+  document.getElementById('breadcrumb-course').textContent = currentCourse.title;
+  document.getElementById('teacher-photo').textContent = currentCourse.teacher.emoji;
+  document.getElementById('teacher-name').textContent  = currentCourse.teacher.name;
+  document.getElementById('teacher-sub').textContent   = currentCourse.teacher.sub;
+
+  const chSel = document.getElementById('chapter-select');
+  chSel.innerHTML = '<option value="">— Choose Chapter —</option>';
+  Object.keys(currentCourse.chapters).forEach(ch => {
+    chSel.innerHTML += `<option value="${ch}">${ch}</option>`;
+  });
+  document.getElementById('topic-select').innerHTML = '<option value="">— Choose Topic —</option>';
+
+  goTo('page-detail');
+}
+
+function loadTopics() {
+  const chapter = document.getElementById('chapter-select').value;
+  const topSel  = document.getElementById('topic-select');
+  topSel.innerHTML = '<option value="">— Choose Topic —</option>';
+  if (!chapter || !currentCourse) return;
+  currentCourse.chapters[chapter].forEach(t => {
+    topSel.innerHTML += `<option value="${t}">${t}</option>`;
+  });
+}
+
+function confirmLesson() {
+  const chapter = document.getElementById('chapter-select').value;
+  const topic   = document.getElementById('topic-select').value;
+  if (!chapter) { alert('Please select a chapter first!'); return; }
+  if (!topic)   { alert('Please select a topic!'); return; }
+
+  currentTopic = topic;
+  document.getElementById('bc-course2').textContent  = currentCourse.title;
+  document.getElementById('bc-lesson').textContent   = topic;
+  document.getElementById('video-label').textContent = `${topic} · Loading from DB...`;
+  document.getElementById('code-filename').textContent = `${topic.toLowerCase().replace(/[^a-z0-9]+/g,'_')}.py`;
+
+  // Load code sample
+  const sample = (currentCourse.codeSamples && currentCourse.codeSamples[topic])
+    || `# ${topic}\n# Write your code here...\n\nprint("Hello from EduPortal!")`;
+  document.getElementById('code-textarea').value = sample;
+  document.getElementById('code-output').textContent = '// Output will appear here...';
+
+  renderFAQs();
+  switchTab('faq');
+  goTo('page-lesson');
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(tab) {
+  activeTab = tab;
+  document.getElementById('panel-faq').style.display  = tab==='faq'  ? 'block' : 'none';
+  document.getElementById('panel-code').className = 'code-panel' + (tab==='code' ? ' visible' : '');
+  document.getElementById('tab-faq').className  = 'faq-tab' + (tab==='faq'  ? ' active' : '');
+  document.getElementById('tab-code').className = 'faq-tab' + (tab==='code' ? ' active' : '');
+}
+
+// ============================================================
+// SIMPLE PYTHON EMULATOR
+// ============================================================
+function runCode() {
+  const code = document.getElementById('code-textarea').value;
+  const out  = document.getElementById('code-output');
+  let output = '';
+
+  try {
+    const lines   = code.split('\n');
+    const prints  = [];
+    const varStore = {};
+
+    // simple tokeniser: handle print(), variable assignment, f-strings
+    function evalExpr(expr) {
+      expr = expr.trim();
+      // f-string
+      if ((expr.startsWith('f"') || expr.startsWith("f'")) ) {
+        let s = expr.slice(2,-1);
+        s = s.replace(/\{([^}]+)\}/g, (_,k) => {
+          k = k.trim().split(':')[0];
+          return evalExpr(k) ?? `{${k}}`;
+        });
+        return s;
+      }
+      // string literal
+      if ((expr.startsWith('"') && expr.endsWith('"')) || (expr.startsWith("'") && expr.endsWith("'")))
+        return expr.slice(1,-1);
+      // number
+      if (!isNaN(expr)) return Number(expr);
+      // boolean
+      if (expr==='True') return true;
+      if (expr==='False') return false;
+      // variable
+      if (varStore.hasOwnProperty(expr)) return varStore[expr];
+      // len()
+      if (expr.startsWith('len(')) {
+        const inner = expr.slice(4,-1).trim();
+        const val = evalExpr(inner);
+        return typeof val === 'string' ? val.length : (Array.isArray(val) ? val.length : 0);
+      }
+      // type()
+      if (expr.startsWith('type(')) {
+        const inner = expr.slice(5,-1).trim();
+        const val = evalExpr(inner);
+        if (typeof val === 'number') return "<class 'int'>";
+        if (typeof val === 'string') return "<class 'str'>";
+        if (typeof val === 'boolean') return "<class 'bool'>";
+        return "<class 'object'>";
+      }
+      // arithmetic
+      try { return Function('"use strict";const vars='+JSON.stringify(varStore)+';with(vars){return '+expr+'}')(); }
+      catch(e) { return expr; }
+    }
+
+    for (let line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      if (trimmed.startsWith('print(')) {
+        let inner = trimmed.slice(6, -1).trim();
+        // handle multiple args
+        const args = inner.split(/,(?![^(]*\))/);
+        const vals = args.map(a => evalExpr(a.trim()));
+        prints.push(vals.join(' '));
+      } else if (trimmed.includes('=') && !trimmed.includes('==')) {
+        const eqIdx = trimmed.indexOf('=');
+        const varName = trimmed.slice(0, eqIdx).trim();
+        const valExpr = trimmed.slice(eqIdx+1).trim();
+        if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(varName)) {
+          varStore[varName] = evalExpr(valExpr);
+        }
+      }
+    }
+
+    output = prints.length ? prints.join('\n') : '// No output — add print() statements';
+  } catch(e) {
+    output = `// Error: ${e.message}`;
+  }
+
+  out.textContent = output;
+  out.style.color = output.startsWith('// Error') ? '#ff5f57' : 'var(--green)';
+}
+
+// ============================================================
+// FAQs
+// ============================================================
+function renderFAQs() {
+  const list = document.getElementById('faq-list');
+  list.innerHTML = faqs.map((f,i) => `
+    <div class="faq-item">
+      <div class="faq-q">
+        <div class="faq-avatar" style="background:${f.color}18;color:${f.color}">${f.user[0]}</div>
+        <div class="faq-body">
+          <div class="faq-username" style="color:${f.color}">${f.user}</div>
+          <div class="faq-text">❓ ${f.q}</div>
+        </div>
+      </div>
+      <div class="faq-answer">💡 ${f.a}</div>
+      <div class="faq-upvote">
+        <button class="upvote-btn" onclick="upvote(this,${i})">▲ Upvote <span class="uv-count">${f.upvotes}</span></button>
+        <span style="font-size:0.7rem;color:var(--text-muted);margin-left:6px;">Helpful?</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function upvote(btn, i) {
+  faqs[i].upvotes++;
+  btn.querySelector('.uv-count').textContent = faqs[i].upvotes;
+  btn.style.color = 'var(--cyan)';
+  btn.style.borderColor = 'var(--cyan)';
+}
+
+function toggleFS() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderCourses();
+</script>
+</body>
+</html>
