@@ -1075,7 +1075,7 @@ ul { list-style: none; }
     <ul>
       <li><a href="#" class="menu-item active" id="dashboardBtn"><i class="fa-solid fa-house"></i> Dashboard</a></li>
       <li><a href="/practice_arena.html" class="menu-item"><i class="fa-solid fa-dumbbell"></i> Practice Arena</a></li>
-      <li><a href="/battle_arena.html" class="menu-item"><i class="fa-solid fa-swords"></i> Battle Arena</a></li>
+      <li><a href="/battle_arena.html" class="menu-item"><i class="fa-solid fa-bars"></i> Battle Arena</a></li>
     </ul>
   </nav>
 
@@ -1083,7 +1083,7 @@ ul { list-style: none; }
   <nav>
     <ul>
       <li><a href="/courses.html" class="menu-item"><i class="fa-solid fa-book-open"></i> My Courses</a></li>
-      <li><a href="#" class="menu-item"><i class="fa-solid fa-chart-line"></i> Progress</a></li>
+      <li><a href="/progress.html" class="menu-item"><i class="fa-solid fa-chart-line"></i> Progress</a></li>
     </ul>
   </nav>
 
@@ -1116,10 +1116,10 @@ ul { list-style: none; }
 
       <div class="notif-btn"><i class="fa-solid fa-bell"></i><div class="notif-dot"></div></div>
 
-      <div class="user-profile" id="userProfileBtn">
-        <div class="avatar" id="userAvatar">JD</div>
+      <div class="user-profile" id="userProfileBtn" onclick="window.location.href='new6.html'" title="View Profile" style="cursor:pointer;">
+        <div class="avatar" id="userAvatar"></div>
         <div>
-          <div class="user-info-text" id="userName">John Doe</div>
+          <div class="user-info-text" id="userName"></div>
           <div class="user-role-text" id="userRole">// student</div>
         </div>
       </div>
@@ -1137,7 +1137,7 @@ ul { list-style: none; }
         <div class="welcome-banner">
           <div>
             <div class="welcome-eyebrow">Good to see you</div>
-            <h1>Welcome back, <span id="welcomeName">John</span>!</h1>
+            <h1>Welcome back, <span id="welcomeName"></span>!</h1>
             <p>Track your progress, take quizzes, and keep the streak alive.</p>
           </div>
           <button class="welcome-cta" onclick="showView('quiz')">▶ Take a Quiz</button>
@@ -1339,6 +1339,54 @@ ul { list-style: none; }
     <div class="modal-top-line"></div>
     <button class="close-modal" id="closeModal">✕</button>
 
+    <!-- ── PROFILE PANEL (shown when logged in) ── -->
+    <div id="profilePanel" class="hidden">
+      <div class="modal-header" style="margin-bottom:20px;">
+        <h2>My Profile</h2>
+        <p style="font-family:'Space Mono',monospace;font-size:0.72rem;color:var(--text-muted);">// Logged in session</p>
+      </div>
+
+      <!-- Avatar + name -->
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding:16px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);">
+        <div id="modalAvatar" style="width:52px;height:52px;border-radius:12px;background:var(--cyan-dim);border:1px solid var(--cyan);color:var(--cyan);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-weight:700;font-size:1.1rem;flex-shrink:0;box-shadow:0 0 18px var(--cyan-dim);"></div>
+        <div>
+          <div id="modalName" style="font-size:1.1rem;font-weight:700;margin-bottom:3px;"></div>
+          <div id="modalStudentId" style="font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--cyan);letter-spacing:0.08em;"></div>
+          <div id="modalEmail" style="font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--text-muted);margin-top:2px;"></div>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;">
+          <div id="modalCourses" style="font-family:'Space Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--cyan);"></div>
+          <div style="font-family:'Space Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-top:3px;">Courses</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;">
+          <div id="modalQuizzes" style="font-family:'Space Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--green);"></div>
+          <div style="font-family:'Space Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-top:3px;">Quizzes</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;">
+          <div id="modalScore" style="font-family:'Space Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--orange);"></div>
+          <div style="font-family:'Space Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-top:3px;">Avg Score</div>
+        </div>
+      </div>
+
+      <!-- Learning tags -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+        <div style="font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border);padding:5px 12px;border-radius:6px;">📖 <span id="modalReading"></span></div>
+        <div style="font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border);padding:5px 12px;border-radius:6px;">👁 <span id="modalVisual"></span></div>
+        <div style="font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border);padding:5px 12px;border-radius:6px;">🧠 <span id="modalPattern"></span></div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-primary" style="flex:1;" onclick="document.getElementById('authModal').classList.add('hidden');">Continue Learning</button>
+        <button class="btn btn-secondary" id="modalLogoutBtn">Logout</button>
+      </div>
+    </div>
+
+    <!-- ── LOGIN FORM ── -->
     <div id="loginFormContainer">
       <div class="modal-header">
         <h2>Login to EduPortal</h2>
@@ -1352,6 +1400,7 @@ ul { list-style: none; }
       <div class="modal-switch">Don't have an account? <a id="showRegisterBtn">Register here</a></div>
     </div>
 
+    <!-- ── REGISTER FORM ── -->
     <div id="registerFormContainer" class="hidden">
       <div class="modal-header">
         <h2>Create Account</h2>
@@ -1520,6 +1569,7 @@ function loadDashboard() {
   document.getElementById('readingLevel').textContent  = currentUser.reading_level;
   document.getElementById('visualPref').textContent    = currentUser.visual_preference;
   document.getElementById('learningPattern').textContent = currentUser.learning_pattern;
+  populateProfileModal(currentUser);
   loadCourses(demoCourses);
 }
 
@@ -1664,8 +1714,31 @@ function showView(view) {
   }
 }
 
+function populateProfileModal(user) {
+  const initials = user.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('modalAvatar').textContent    = initials;
+  document.getElementById('modalName').textContent      = user.name;
+  document.getElementById('modalStudentId').textContent = '// ' + user.student_id;
+  document.getElementById('modalEmail').textContent     = user.email || '';
+  document.getElementById('modalCourses').textContent   = user.enrolled_courses || 0;
+  document.getElementById('modalQuizzes').textContent   = user.quizzes_completed || 0;
+  document.getElementById('modalScore').textContent     = (user.average_score || 0) + '%';
+  document.getElementById('modalReading').textContent   = user.reading_level || 'Grade 8';
+  document.getElementById('modalVisual').textContent    = user.visual_preference || 'Normal Mode';
+  document.getElementById('modalPattern').textContent   = user.learning_pattern || 'Mixed';
+}
+
+function showProfileModal() {
+  authModal.classList.remove('hidden');
+  document.getElementById('profilePanel').classList.remove('hidden');
+  loginFormCont.classList.add('hidden');
+  registerFormCont.classList.add('hidden');
+  if (currentUser) populateProfileModal(currentUser);
+}
+
 function showAuthModal() {
   authModal.classList.remove('hidden');
+  document.getElementById('profilePanel').classList.add('hidden');
   loginFormCont.classList.remove('hidden');
   registerFormCont.classList.add('hidden');
 }
@@ -1674,7 +1747,9 @@ function showAuthModal() {
 document.getElementById('dashboardBtn').addEventListener('click', e=>{e.preventDefault();showView('dashboard');});
 document.getElementById('quizBtn').addEventListener('click', e=>{e.preventDefault();showView('quiz');});
 document.getElementById('codingBattleBtn').addEventListener('click', e=>{e.preventDefault();showView('coding');});
-document.getElementById('closeModal').addEventListener('click', ()=>{if(authToken) authModal.classList.add('hidden');});
+document.getElementById('userProfileBtn').addEventListener('click', ()=>{ if(currentUser) showProfileModal(); else showAuthModal(); });
+document.getElementById('closeModal').addEventListener('click', ()=>{ authModal.classList.add('hidden'); });
+document.getElementById('modalLogoutBtn').addEventListener('click', ()=>{ clearSession(); currentUser=null; authModal.classList.add('hidden'); showView('dashboard'); showAuthModal(); });
 document.getElementById('loginForm').addEventListener('submit', async e=>{e.preventDefault();login(document.getElementById('loginStudentId').value, document.getElementById('loginPassword').value);});
 document.getElementById('registerForm').addEventListener('submit', async e=>{
   e.preventDefault();

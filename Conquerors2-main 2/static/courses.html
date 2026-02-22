@@ -37,7 +37,6 @@ body {
   overflow-x: hidden;
 }
 
-/* GRID BACKGROUND */
 body::before {
   content: '';
   position: fixed;
@@ -50,7 +49,6 @@ body::before {
   z-index: 0;
 }
 
-/* AMBIENT GLOW ORBS */
 body::after {
   content: '';
   position: fixed;
@@ -61,9 +59,6 @@ body::after {
   z-index: 0;
 }
 
-/* ============================================================
-   PAGES
-   ============================================================ */
 .page { display: none; min-height: 100vh; position: relative; z-index: 1; }
 .page.active { display: block; animation: pageIn 0.4s cubic-bezier(0.16,1,0.3,1) both; }
 @keyframes pageIn {
@@ -71,9 +66,6 @@ body::after {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ============================================================
-   TOPBAR
-   ============================================================ */
 .topbar {
   background: rgba(4,6,16,0.85);
   backdrop-filter: blur(20px);
@@ -88,7 +80,6 @@ body::after {
   z-index: 100;
 }
 
-/* LOGO */
 .logo {
   display: flex;
   align-items: center;
@@ -142,7 +133,6 @@ body::after {
 }
 .back-btn:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); }
 
-/* TOPBAR STATUS DOTS */
 .status-row {
   margin-left: auto;
   display: flex;
@@ -166,9 +156,7 @@ body::after {
 }
 @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
 
-/* ============================================================
-   PAGE 1: COURSES
-   ============================================================ */
+/* PAGE 1 */
 .courses-header {
   padding: 56px 48px 32px;
   position: relative;
@@ -208,7 +196,6 @@ body::after {
   font-size: 1rem;
 }
 
-/* FILTER BAR */
 .filter-bar {
   padding: 0 48px 28px;
   display: flex;
@@ -233,7 +220,6 @@ body::after {
   box-shadow: 0 0 12px var(--cyan-dim);
 }
 
-/* COURSES GRID */
 .courses-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -252,7 +238,6 @@ body::after {
   overflow: hidden;
 }
 
-/* Accent line top */
 .course-card::before {
   content: '';
   position: absolute;
@@ -263,7 +248,6 @@ body::after {
   transition: opacity 0.3s;
   box-shadow: 0 0 20px var(--card-accent, var(--cyan));
 }
-/* Corner glow */
 .course-card::after {
   content: '';
   position: absolute;
@@ -284,7 +268,6 @@ body::after {
 .course-card:hover::before { opacity: 1; }
 .course-card:hover::after  { opacity: 1; }
 
-/* Card colors */
 .course-card[data-color="cyan"]   { --card-accent: var(--cyan);   --card-glow: var(--cyan-dim);   }
 .course-card[data-color="green"]  { --card-accent: var(--green);  --card-glow: var(--green-dim);  }
 .course-card[data-color="orange"] { --card-accent: var(--orange); --card-glow: var(--orange-dim); }
@@ -340,7 +323,6 @@ body::after {
   display: inline-block;
 }
 
-/* CARD BOTTOM: progress bar flair */
 .card-footer {
   margin-top: 18px;
   padding-top: 14px;
@@ -359,9 +341,7 @@ body::after {
 }
 .course-card:hover .card-arrow { transform: translateX(4px); }
 
-/* ============================================================
-   PAGE 2: COURSE DETAIL
-   ============================================================ */
+/* PAGE 2 */
 .detail-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -464,7 +444,6 @@ body::after {
 .confirm-btn:hover { transform: translateY(-2px); box-shadow: 0 0 50px var(--cyan-glow); }
 .confirm-btn:hover::before { transform: translateX(100%); }
 
-/* TEACHER CARD */
 .main-content {
   display: flex;
   flex-direction: column;
@@ -547,11 +526,7 @@ body::after {
   position: relative; z-index: 1;
 }
 
-
-
-/* ============================================================
-   PAGE 3: LESSON
-   ============================================================ */
+/* PAGE 3 */
 .lesson-layout {
   display: flex;
   flex-direction: column;
@@ -560,11 +535,15 @@ body::after {
 
 .video-section {
   display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 14px;
+  grid-template-columns: 60% 38%;
+  gap: 10px;
   padding: 20px 20px 0;
+  align-items: start;
 }
 
+/* ============================================================
+   VIDEO PRIMARY — updated to support real <video> element
+   ============================================================ */
 .video-primary {
   background: #000;
   border-radius: 10px;
@@ -579,13 +558,31 @@ body::after {
   overflow: hidden;
   box-shadow: 0 0 40px rgba(0,0,0,0.6), 0 0 1px var(--cyan) inset;
 }
+
+/* The actual <video> tag fills the box */
+.video-primary video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+  z-index: 10;         /* above ALL overlays */
+  background: #000;
+}
+
+/* dark overlay before video loads */
 .video-primary::before {
   content: '';
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(135deg, rgba(0,15,40,0.9) 0%, rgba(0,5,20,0.95) 100%);
+  background: linear-gradient(135deg, rgba(0,15,40,0.9) 0%, rgba(0,5,20,0.95) 100%);
+  z-index: 1;
+  transition: opacity 0.4s;
+  pointer-events: none;   /* NEVER block clicks */
 }
+.video-primary.has-video::before { opacity: 0; }
+
 .video-scanlines {
   position: absolute;
   inset: 0;
@@ -595,10 +592,14 @@ body::after {
     rgba(0,245,255,0.015) 2px,
     rgba(0,245,255,0.015) 4px
   );
-  pointer-events: none;
+  pointer-events: none;   /* NEVER block clicks */
+  z-index: 11;            /* above video visually, but pointer-events:none so clicks pass through */
 }
+.video-primary.has-video .video-scanlines { opacity: 0; }
+
+/* Play / placeholder icons — hidden when video loaded */
 .play-icon {
-  position: relative; z-index: 2;
+  position: relative; z-index: 5;
   width: 64px; height: 64px;
   background: var(--cyan);
   border-radius: 50%;
@@ -610,29 +611,47 @@ body::after {
   box-shadow: 0 0 40px var(--cyan-glow);
 }
 .play-icon:hover { transform: scale(1.1); box-shadow: 0 0 60px var(--cyan-glow); }
+.video-primary.has-video .play-icon { display: none; }
+
 .vid-label {
-  position: relative; z-index: 2;
+  position: relative; z-index: 5;
   font-family: 'Space Mono', monospace;
   font-size: 0.78rem;
   color: var(--cyan);
   opacity: 0.8;
   letter-spacing: 0.05em;
+  text-align: center;
+  padding: 0 16px;
 }
+.video-primary.has-video .vid-label { display: none; }
+
 .video-corner {
   position: absolute;
   top: 12px; left: 12px;
-  z-index: 3;
+  z-index: 5;
+  pointer-events: none;
   font-family: 'Space Mono', monospace;
   font-size: 0.65rem;
   color: var(--green);
   display: flex; align-items: center; gap: 6px;
 }
+.video-primary.has-video .video-corner { display: none; }
 .vid-live-dot {
   width: 6px; height: 6px;
   border-radius: 50%;
   background: var(--green);
   box-shadow: 0 0 6px var(--green);
   animation: pulse 1.5s infinite;
+}
+
+/* No-video notice */
+.no-video-notice {
+  position: relative; z-index: 2;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 /* VIDEO SIDEBAR */
@@ -667,7 +686,6 @@ body::after {
   flex: 1;
 }
 
-/* CODE VIEWER (replaces FAQs heading but keeps FAQs) */
 .faq-section {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -765,7 +783,6 @@ body::after {
 }
 .upvote-btn:hover { border-color: var(--cyan); color: var(--cyan); }
 
-/* DOWNLOAD SECTION */
 .dd-section {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -801,7 +818,6 @@ body::after {
 }
 .dd-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
 
-/* CODE PANEL */
 .code-panel {
   display: none;
   padding: 12px;
@@ -875,7 +891,6 @@ body::after {
   white-space: pre-wrap;
 }
 
-/* FULLSCREEN BAR */
 .fullscreen-bar {
   background: var(--surface);
   border-top: 1px solid var(--border);
@@ -901,13 +916,11 @@ body::after {
 }
 .fullscreen-btn:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); box-shadow: 0 0 20px var(--cyan-dim); }
 
-/* SCROLLBAR */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
 
-/* HOVER STAGGER ANIMATION FOR CARDS */
 .courses-grid .course-card {
   animation: cardIn 0.5s cubic-bezier(0.16,1,0.3,1) both;
 }
@@ -919,18 +932,14 @@ body::after {
 </head>
 <body>
 
-<!-- ============================================================
-     PAGE 1: COURSES LIST
-     ============================================================ -->
+<!-- PAGE 1 -->
 <div class="page active" id="page-courses">
   <div class="topbar">
     <a class="logo" onclick="goTo('page-courses')" style="cursor:pointer">
       <div class="logo-icon">
-        <!-- Python snake SVG logo -->
         <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="40" height="40" rx="9" fill="#040610"/>
           <rect width="40" height="40" rx="9" fill="url(#grad)" opacity="0.15"/>
-          <!-- Python logo inspired -->
           <path d="M20 7C15.5 7 13 9 13 12v2.5h7V16H11C8.5 16 7 18 7 21s1.5 5 4 5h2v-3c0-2.5 2-4.5 4.5-4.5h5c2.2 0 4-1.8 4-4v-3.5C27.5 8.5 25 7 20 7z" fill="#4B8BBE"/>
           <circle cx="17" cy="12" r="1.2" fill="#FFD43B"/>
           <path d="M20 33c4.5 0 7-2 7-5v-2.5h-7V24h9c2.5 0 4-2 4-5s-1.5-5-4-5h-2v3c0 2.5-2 4.5-4.5 4.5h-5c-2.2 0-4 1.8-4 4V29c0 2.5 2.5 4 7 4z" fill="#FFD43B"/>
@@ -970,9 +979,7 @@ body::after {
   <div class="courses-grid" id="courses-grid"></div>
 </div>
 
-<!-- ============================================================
-     PAGE 2: COURSE DETAIL
-     ============================================================ -->
+<!-- PAGE 2 -->
 <div class="page" id="page-detail">
   <div class="topbar">
     <a class="logo" onclick="goTo('page-courses')" style="cursor:pointer">
@@ -1017,14 +1024,11 @@ body::after {
         <div class="teacher-sub" id="teacher-sub">Department</div>
         <div class="teacher-badge">// Course Instructor</div>
       </div>
-
     </div>
   </div>
 </div>
 
-<!-- ============================================================
-     PAGE 3: LESSON
-     ============================================================ -->
+<!-- PAGE 3 -->
 <div class="page" id="page-lesson">
   <div class="topbar">
     <a class="logo" onclick="goTo('page-courses')" style="cursor:pointer">
@@ -1051,36 +1055,47 @@ body::after {
 
   <div class="lesson-layout">
     <div class="video-section">
-      <div class="video-primary">
+
+      <!-- =====================================================
+           VIDEO PRIMARY BOX
+           The <video> element is injected here by JS.
+           When no video is mapped, the placeholder is shown.
+           ===================================================== -->
+      <div class="video-primary" id="video-primary">
         <div class="video-scanlines"></div>
         <div class="video-corner"><div class="vid-live-dot"></div> LIVE LESSON</div>
-        <div class="play-icon">▶</div>
-        <div class="vid-label" id="video-label">Select a topic to load video</div>
+
+        <!-- Placeholder shown when there is NO video for the topic -->
+        <div class="no-video-notice" id="no-video-notice">
+          <div class="play-icon">▶</div>
+          <div class="vid-label" id="video-label">Select a topic to load video</div>
+        </div>
       </div>
+
+      <!-- RIGHT / SECONDARY VIDEO BOX -->
       <div class="video-sidebar">
-        <div class="video-thumb">
-          <div class="thumb-icon">🎞️</div>
-          <div class="thumb-title">Animation Panel</div>
-          <div class="thumb-sub">// Visual Aid</div>
-          <div class="thumb-desc">Supplementary animation plays alongside the main lecture</div>
+        <div id="video-secondary-box" style="padding:0;overflow:hidden;position:relative;width:100%;aspect-ratio:16/9;border-radius:10px;border:1px solid var(--border2);background:#000;box-shadow:0 0 30px rgba(0,0,0,0.5);">
+          <div id="secondary-placeholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:100%;height:100%;min-height:120px;padding:16px;">
+            <div class="thumb-icon">🎞️</div>
+            <div class="thumb-title">Visual Aid</div>
+            <div class="thumb-sub">// Secondary Video</div>
+            <div class="thumb-desc">Companion video plays muted alongside the lecture</div>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="bottom-row">
-      <!-- FAQ + Code Panel -->
       <div class="faq-section">
         <div style="display:flex; border-bottom:1px solid var(--border);">
           <button class="faq-tab active" id="tab-faq" onclick="switchTab('faq')">💬 Discussions</button>
           <button class="faq-tab" id="tab-code" onclick="switchTab('code')">⌨ Try It Live</button>
         </div>
 
-        <!-- FAQs -->
         <div id="panel-faq">
           <div class="faq-list" id="faq-list"></div>
         </div>
 
-        <!-- Code Editor -->
         <div id="panel-code" class="code-panel">
           <div class="code-editor-wrap">
             <div class="code-editor-bar">
@@ -1097,14 +1112,29 @@ body::after {
         </div>
       </div>
 
-      <!-- Downloads -->
       <div class="dd-section">
         <div class="dd-header">// Downloads</div>
-        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px;">Materials for this topic</div>
-        <button class="dd-btn">📄 Lecture Notes</button>
-        <button class="dd-btn">📊 Slides (PDF)</button>
-        <button class="dd-btn">📝 Practice Sheet</button>
-        <button class="dd-btn">🔗 References</button>
+        <div id="dd-subtitle" style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px;">Materials for this topic</div>
+        <button class="dd-btn" id="btn-notes"    onclick="showAIDoc('notes')"    style="display:none">📄 Lecture Notes  <span style="font-size:0.62rem;color:var(--cyan);margin-left:auto;font-family:'Space Mono',monospace;">AI</span></button>
+        <button class="dd-btn" id="btn-slides"   onclick="showAIDoc('slides')"   style="display:none">📊 Slides (PDF)   <span style="font-size:0.62rem;color:var(--cyan);margin-left:auto;font-family:'Space Mono',monospace;">AI</span></button>
+        <button class="dd-btn" id="btn-practice" onclick="showAIDoc('practice')" style="display:none">📝 Practice Sheet <span style="font-size:0.62rem;color:var(--cyan);margin-left:auto;font-family:'Space Mono',monospace;">AI</span></button>
+        <button class="dd-btn" id="btn-refs"     onclick="showAIDoc('refs')"     style="display:none">🔗 References     <span style="font-size:0.62rem;color:var(--cyan);margin-left:auto;font-family:'Space Mono',monospace;">AI</span></button>
+        <button class="dd-btn" id="btn-s-notes"    style="display:flex">📄 Lecture Notes</button>
+        <button class="dd-btn" id="btn-s-slides"   style="display:flex">📊 Slides (PDF)</button>
+        <button class="dd-btn" id="btn-s-practice" style="display:flex">📝 Practice Sheet</button>
+        <button class="dd-btn" id="btn-s-refs"     style="display:flex">🔗 References</button>
+      </div>
+
+      <!-- AI MODAL -->
+      <div id="ai-modal" onclick="if(event.target===this)this.style.display='none'"
+        style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(4,6,16,0.93);backdrop-filter:blur(10px);align-items:center;justify-content:center;">
+        <div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;width:min(740px,93vw);max-height:84vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 80px rgba(0,245,255,0.08);">
+          <div style="padding:14px 22px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+            <div id="modal-title" style="font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--cyan);">// Document</div>
+            <button onclick="document.getElementById('ai-modal').style.display='none'" style="background:transparent;border:1px solid var(--border2);color:var(--text-muted);padding:5px 14px;border-radius:5px;cursor:pointer;font-family:'Space Mono',monospace;font-size:0.75rem;">✕ Close</button>
+          </div>
+          <div id="modal-body" style="padding:26px 30px;overflow-y:auto;flex:1;font-size:0.88rem;line-height:1.85;color:var(--text-dim);"></div>
+        </div>
       </div>
     </div>
 
@@ -1115,6 +1145,23 @@ body::after {
 </div>
 
 <script>
+// ============================================================
+// VIDEO MAP — PRIMARY (left / main box)
+// KEY = exact topic string, VALUE = video filename (same folder)
+// ============================================================
+const VIDEO_MAP = {
+  "Variables & Data Types": "variable1.mp4",   // Basic Python → Ch1 → Variables
+  "Ionic Bonds":            "bond1.mp4",        // Chemistry → Bonding → Ionic Bonds
+}
+
+// ============================================================
+// VIDEO MAP — SECONDARY (right box, plays muted alongside main)
+// ============================================================
+const VIDEO_MAP_2 = {
+  "Variables & Data Types": "variable2.mp4",   // muted companion video
+  "Ionic Bonds":            "bond2.mp4",        // muted companion video
+};
+
 // ============================================================
 // DATA
 // ============================================================
@@ -1335,15 +1382,21 @@ let activeTab     = 'faq';
 // NAVIGATION
 // ============================================================
 function goTo(pageId) {
+  // Pause any playing videos when navigating away
+  const vid  = document.getElementById('lesson-video');
+  const vid2 = document.getElementById('lesson-video-2');
+  if (vid)  vid.pause();
+  if (vid2) vid2.pause();
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
 }
 
 // ============================================================
 // RENDER COURSES
 // ============================================================
-function renderCourses(filter='all') {
+function renderCourses(filter = 'all') {
   const grid = document.getElementById('courses-grid');
   const filtered = filter === 'all' ? courses : courses.filter(c => c.tag === filter);
 
@@ -1402,6 +1455,9 @@ function loadTopics() {
   });
 }
 
+// ============================================================
+// CONFIRM LESSON — loads video if mapped, else shows placeholder
+// ============================================================
 function confirmLesson() {
   const chapter = document.getElementById('chapter-select').value;
   const topic   = document.getElementById('topic-select').value;
@@ -1409,10 +1465,100 @@ function confirmLesson() {
   if (!topic)   { alert('Please select a topic!'); return; }
 
   currentTopic = topic;
-  document.getElementById('bc-course2').textContent  = currentCourse.title;
-  document.getElementById('bc-lesson').textContent   = topic;
-  document.getElementById('video-label').textContent = `${topic} · Loading from DB...`;
-  document.getElementById('code-filename').textContent = `${topic.toLowerCase().replace(/[^a-z0-9]+/g,'_')}.py`;
+
+  // Update breadcrumbs
+  document.getElementById('bc-course2').textContent = currentCourse.title;
+  document.getElementById('bc-lesson').textContent  = topic;
+  document.getElementById('video-label').textContent = `${topic} · Loading...`;
+  document.getElementById('code-filename').textContent =
+    `${topic.toLowerCase().replace(/[^a-z0-9]+/g, '_')}.py`;
+
+  // ── PRIMARY VIDEO (left / main box) ───────────────────────
+  const videoBox  = document.getElementById('video-primary');
+  const noticeDIV = document.getElementById('no-video-notice');
+
+  // Remove old primary video
+  const oldVid = document.getElementById('lesson-video');
+  if (oldVid) oldVid.remove();
+  videoBox.classList.remove('has-video');
+
+  const videoSrc = VIDEO_MAP[topic];
+
+  if (videoSrc) {
+    const vid    = document.createElement('video');
+    vid.id       = 'lesson-video';
+    vid.src      = videoSrc;
+    vid.controls = true;
+    vid.autoplay = false;
+    vid.preload  = 'auto';
+    // Inline styles guarantee visibility regardless of CSS specificity issues
+    vid.style.cssText =
+      'position:absolute;inset:0;width:100%;height:100%;' +
+      'object-fit:contain;border-radius:10px;background:#000;z-index:10;display:block;';
+
+    // Show video as soon as metadata loads (works on file:// too)
+    vid.addEventListener('loadedmetadata', () => {
+      videoBox.classList.add('has-video');
+      noticeDIV.style.display = 'none';
+      document.getElementById('video-label').textContent = topic;
+    });
+
+    vid.onerror = () => {
+      vid.remove();
+      videoBox.classList.remove('has-video');
+      noticeDIV.style.display = 'flex';
+      document.getElementById('video-label').textContent =
+        `⚠ "${videoSrc}" not found — place it in the same folder as this HTML file`;
+    };
+
+    videoBox.appendChild(vid);
+    // Optimistic: show box immediately, loadedmetadata will confirm
+    videoBox.classList.add('has-video');
+    noticeDIV.style.display = 'none';
+  } else {
+    noticeDIV.style.display = 'flex';
+    document.getElementById('video-label').textContent =
+      `${topic} · No video available yet`;
+  }
+
+  // ── SECONDARY VIDEO (right box — muted, no controls, syncs with primary) ──
+  const secBox         = document.getElementById('video-secondary-box');
+  const secPlaceholder = document.getElementById('secondary-placeholder');
+
+  const oldVid2 = document.getElementById('lesson-video-2');
+  if (oldVid2) oldVid2.remove();
+
+  const videoSrc2 = VIDEO_MAP_2[topic];
+
+  if (videoSrc2) {
+    const vid2       = document.createElement('video');
+    vid2.id          = 'lesson-video-2';
+    vid2.src         = videoSrc2;
+    vid2.controls    = false;
+    vid2.autoplay    = false;
+    vid2.preload     = 'auto';
+    vid2.muted       = true;
+    vid2.loop        = false;
+    vid2.style.cssText =
+      'position:absolute;inset:0;width:100%;height:100%;' +
+      'object-fit:cover;border-radius:10px;background:#000;' +
+      'z-index:2;pointer-events:none;display:block;';
+
+    secBox.appendChild(vid2);
+    secPlaceholder.style.display = 'none';
+
+    // sync: vid2 follows primary video exactly
+    const vid1 = document.getElementById('lesson-video');
+    if (vid1) {
+      vid1.addEventListener('play',   () => { vid2.currentTime = vid1.currentTime; vid2.play(); });
+      vid1.addEventListener('pause',  () => { vid2.pause(); });
+      vid1.addEventListener('seeked', () => { vid2.currentTime = vid1.currentTime; });
+      vid1.addEventListener('ended',  () => { vid2.pause(); vid2.currentTime = 0; });
+    }
+  } else {
+    secPlaceholder.style.display = 'flex';
+  }
+  // ──────────────────────────────────────────────────────────
 
   // Load code sample
   const sample = (currentCourse.codeSamples && currentCourse.codeSamples[topic])
@@ -1420,6 +1566,7 @@ function confirmLesson() {
   document.getElementById('code-textarea').value = sample;
   document.getElementById('code-output').textContent = '// Output will appear here...';
 
+  updateDownloadButtons(topic);
   renderFAQs();
   switchTab('faq');
   goTo('page-lesson');
@@ -1430,10 +1577,10 @@ function confirmLesson() {
 // ============================================================
 function switchTab(tab) {
   activeTab = tab;
-  document.getElementById('panel-faq').style.display  = tab==='faq'  ? 'block' : 'none';
-  document.getElementById('panel-code').className = 'code-panel' + (tab==='code' ? ' visible' : '');
-  document.getElementById('tab-faq').className  = 'faq-tab' + (tab==='faq'  ? ' active' : '');
-  document.getElementById('tab-code').className = 'faq-tab' + (tab==='code' ? ' active' : '');
+  document.getElementById('panel-faq').style.display  = tab === 'faq'  ? 'block' : 'none';
+  document.getElementById('panel-code').className = 'code-panel' + (tab === 'code' ? ' visible' : '');
+  document.getElementById('tab-faq').className  = 'faq-tab' + (tab === 'faq'  ? ' active' : '');
+  document.getElementById('tab-code').className = 'faq-tab' + (tab === 'code' ? ' active' : '');
 }
 
 // ============================================================
@@ -1445,50 +1592,44 @@ function runCode() {
   let output = '';
 
   try {
-    const lines   = code.split('\n');
-    const prints  = [];
+    const lines    = code.split('\n');
+    const prints   = [];
     const varStore = {};
 
-    // simple tokeniser: handle print(), variable assignment, f-strings
     function evalExpr(expr) {
       expr = expr.trim();
-      // f-string
-      if ((expr.startsWith('f"') || expr.startsWith("f'")) ) {
-        let s = expr.slice(2,-1);
-        s = s.replace(/\{([^}]+)\}/g, (_,k) => {
+      if (expr.startsWith('f"') || expr.startsWith("f'")) {
+        let s = expr.slice(2, -1);
+        s = s.replace(/\{([^}]+)\}/g, (_, k) => {
           k = k.trim().split(':')[0];
           return evalExpr(k) ?? `{${k}}`;
         });
         return s;
       }
-      // string literal
-      if ((expr.startsWith('"') && expr.endsWith('"')) || (expr.startsWith("'") && expr.endsWith("'")))
-        return expr.slice(1,-1);
-      // number
+      if ((expr.startsWith('"') && expr.endsWith('"')) ||
+          (expr.startsWith("'") && expr.endsWith("'")))
+        return expr.slice(1, -1);
       if (!isNaN(expr)) return Number(expr);
-      // boolean
-      if (expr==='True') return true;
-      if (expr==='False') return false;
-      // variable
+      if (expr === 'True')  return true;
+      if (expr === 'False') return false;
       if (varStore.hasOwnProperty(expr)) return varStore[expr];
-      // len()
       if (expr.startsWith('len(')) {
-        const inner = expr.slice(4,-1).trim();
+        const inner = expr.slice(4, -1).trim();
         const val = evalExpr(inner);
         return typeof val === 'string' ? val.length : (Array.isArray(val) ? val.length : 0);
       }
-      // type()
       if (expr.startsWith('type(')) {
-        const inner = expr.slice(5,-1).trim();
+        const inner = expr.slice(5, -1).trim();
         const val = evalExpr(inner);
-        if (typeof val === 'number') return "<class 'int'>";
-        if (typeof val === 'string') return "<class 'str'>";
+        if (typeof val === 'number')  return "<class 'int'>";
+        if (typeof val === 'string')  return "<class 'str'>";
         if (typeof val === 'boolean') return "<class 'bool'>";
         return "<class 'object'>";
       }
-      // arithmetic
-      try { return Function('"use strict";const vars='+JSON.stringify(varStore)+';with(vars){return '+expr+'}')(); }
-      catch(e) { return expr; }
+      try {
+        return Function('"use strict";const vars=' + JSON.stringify(varStore) +
+          ';with(vars){return ' + expr + '}')();
+      } catch (e) { return expr; }
     }
 
     for (let line of lines) {
@@ -1496,14 +1637,13 @@ function runCode() {
       if (!trimmed || trimmed.startsWith('#')) continue;
       if (trimmed.startsWith('print(')) {
         let inner = trimmed.slice(6, -1).trim();
-        // handle multiple args
         const args = inner.split(/,(?![^(]*\))/);
         const vals = args.map(a => evalExpr(a.trim()));
         prints.push(vals.join(' '));
       } else if (trimmed.includes('=') && !trimmed.includes('==')) {
-        const eqIdx = trimmed.indexOf('=');
+        const eqIdx   = trimmed.indexOf('=');
         const varName = trimmed.slice(0, eqIdx).trim();
-        const valExpr = trimmed.slice(eqIdx+1).trim();
+        const valExpr = trimmed.slice(eqIdx + 1).trim();
         if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(varName)) {
           varStore[varName] = evalExpr(valExpr);
         }
@@ -1511,7 +1651,7 @@ function runCode() {
     }
 
     output = prints.length ? prints.join('\n') : '// No output — add print() statements';
-  } catch(e) {
+  } catch (e) {
     output = `// Error: ${e.message}`;
   }
 
@@ -1524,7 +1664,7 @@ function runCode() {
 // ============================================================
 function renderFAQs() {
   const list = document.getElementById('faq-list');
-  list.innerHTML = faqs.map((f,i) => `
+  list.innerHTML = faqs.map((f, i) => `
     <div class="faq-item">
       <div class="faq-q">
         <div class="faq-avatar" style="background:${f.color}18;color:${f.color}">${f.user[0]}</div>
@@ -1550,13 +1690,144 @@ function upvote(btn, i) {
 }
 
 function toggleFS() {
-  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
   else document.exitFullscreen();
 }
 
 // ============================================================
-// INIT
+// AI DOCUMENT CONTENT
 // ============================================================
+const AI_DOCS = {
+  "Variables & Data Types": {
+    notes:`<h2 style="color:var(--cyan);font-size:1.1rem;margin-bottom:16px;font-family:'Space Mono',monospace;">📄 Lecture Notes — Variables & Data Types</h2>
+<h3 style="color:var(--green);font-size:0.9rem;margin:14px 0 8px;">1. What is a Variable?</h3>
+<p>A <strong style="color:var(--text)">variable</strong> is a named container storing a value in memory. Python creates it on assignment — no prior declaration needed.</p>
+<pre style="background:#02050f;border:1px solid var(--border);border-radius:6px;padding:12px;margin:10px 0;font-family:'Space Mono',monospace;font-size:0.78rem;color:#a8d8ff;overflow-x:auto;">name     = "Alice"     # str
+age      = 20           # int
+gpa      = 3.85         # float
+enrolled = True         # bool</pre>
+<h3 style="color:var(--green);font-size:0.9rem;margin:14px 0 8px;">2. Core Data Types</h3>
+<table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+  <tr style="color:var(--cyan);font-family:'Space Mono',monospace;border-bottom:1px solid var(--border);"><th style="padding:7px 10px;text-align:left;">Type</th><th style="padding:7px 10px;text-align:left;">Example</th><th style="padding:7px 10px;text-align:left;">Description</th></tr>
+  <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 10px;color:var(--orange);">int</td><td style="padding:7px 10px;font-family:'Space Mono',monospace;">42</td><td style="padding:7px 10px;">Whole numbers</td></tr>
+  <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 10px;color:var(--orange);">float</td><td style="padding:7px 10px;font-family:'Space Mono',monospace;">3.14</td><td style="padding:7px 10px;">Decimal numbers</td></tr>
+  <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 10px;color:var(--orange);">str</td><td style="padding:7px 10px;font-family:'Space Mono',monospace;">"hello"</td><td style="padding:7px 10px;">Text / characters</td></tr>
+  <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 10px;color:var(--orange);">bool</td><td style="padding:7px 10px;font-family:'Space Mono',monospace;">True/False</td><td style="padding:7px 10px;">Logical values</td></tr>
+  <tr><td style="padding:7px 10px;color:var(--orange);">NoneType</td><td style="padding:7px 10px;font-family:'Space Mono',monospace;">None</td><td style="padding:7px 10px;">Absence of value</td></tr>
+</table>
+<h3 style="color:var(--green);font-size:0.9rem;margin:14px 0 8px;">3. Type Checking & Conversion</h3>
+<pre style="background:#02050f;border:1px solid var(--border);border-radius:6px;padding:12px;margin:10px 0;font-family:'Space Mono',monospace;font-size:0.78rem;color:#a8d8ff;overflow-x:auto;">print(type(42))        # &lt;class 'int'&gt;
+x = int("10")          # "10" → 10
+y = float(5)           # 5   → 5.0
+z = str(3.14)          # 3.14 → "3.14"</pre>
+<h3 style="color:var(--green);font-size:0.9rem;margin:14px 0 8px;">4. Naming Rules</h3>
+<ul style="margin-left:20px;line-height:2.1;"><li>Must start with letter or underscore</li><li>Case-sensitive: <code style="color:var(--cyan);">Name</code> ≠ <code style="color:var(--cyan);">name</code></li><li>No Python keywords: <code style="color:var(--orange);">if, for, while…</code></li></ul>
+<h3 style="color:var(--green);font-size:0.9rem;margin:14px 0 8px;">5. Multiple Assignment</h3>
+<pre style="background:#02050f;border:1px solid var(--border);border-radius:6px;padding:12px;font-family:'Space Mono',monospace;font-size:0.78rem;color:#a8d8ff;">a = b = c = 0
+x, y, z = 1, 2, 3</pre>
+<div style="margin-top:14px;padding:10px 14px;background:rgba(0,245,255,0.05);border-left:2px solid var(--cyan);border-radius:0 6px 6px 0;">💡 <strong style="color:var(--cyan);">Key Takeaway:</strong> Python is dynamically typed — a variable can hold any type. Use <code>type()</code> to inspect it.</div>`,
+
+    slides:`<h2 style="color:var(--cyan);font-size:1.1rem;margin-bottom:16px;font-family:'Space Mono',monospace;">📊 Slides — Variables & Data Types</h2>${[
+['Slide 1 — Introduction','Variables store values in named memory locations. Python creates them on assignment with no declaration needed.'],
+['Slide 2 — int & float','<code style="color:var(--cyan);">int</code> stores whole numbers (e.g. 42). <code style="color:var(--cyan);">float</code> stores decimals (e.g. 3.14). Mixed arithmetic returns float.'],
+['Slide 3 — str & bool','<code style="color:var(--cyan);">str</code> is text in quotes. <code style="color:var(--cyan);">bool</code> holds only <code>True</code> or <code>False</code>, used in conditions.'],
+['Slide 4 — NoneType','<code style="color:var(--cyan);">None</code> represents intentional absence of a value. <code>type(None)</code> returns <code>NoneType</code>.'],
+['Slide 5 — Type Conversion','Use <code>int()</code>, <code>float()</code>, <code>str()</code>, <code>bool()</code> to convert. Invalid conversions raise <code style="color:#ff5f57;">ValueError</code>.'],
+['Slide 6 — Naming Rules','Variables must start with a letter or <code>_</code>, contain only letters/digits/underscores, and avoid reserved keywords.'],
+['Slide 7 — Multiple Assignment','Assign multiple variables in one line: <code>a, b = 1, 2</code>. Swap: <code>a, b = b, a</code>.'],
+['Slide 8 — Summary','Python is dynamically typed. Variables hold references to objects. Use <code>type()</code> to verify at runtime.'],
+].map(([t,b])=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:13px 17px;margin-bottom:10px;"><div style="font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--cyan);margin-bottom:5px;">${t}</div><div style="font-size:0.84rem;color:var(--text-dim);line-height:1.7;">${b}</div></div>`).join('')}`,
+
+    practice:`<h2 style="color:var(--cyan);font-size:1.1rem;margin-bottom:16px;font-family:'Space Mono',monospace;">📝 Practice Sheet — Variables & Data Types</h2>
+<div style="padding:8px 13px;background:rgba(0,255,136,0.05);border-left:2px solid var(--green);border-radius:0 6px 6px 0;font-size:0.82rem;margin-bottom:16px;">Write solutions in the <strong style="color:var(--green)">Try It Live</strong> tab.</div>
+<h3 style="color:var(--orange);font-size:0.88rem;margin:14px 0 8px;">🟢 Level 1 — Basic</h3>
+<ol style="margin-left:20px;line-height:2.2;"><li>Create variables for your <code style="color:var(--cyan);">name</code>, <code style="color:var(--cyan);">age</code>, <code style="color:var(--cyan);">height</code>, and <code style="color:var(--cyan);">is_student</code>. Print all four.</li><li>Use <code style="color:var(--cyan);">type()</code> to print the data type of each variable.</li><li>Assign <code style="color:var(--cyan);">100</code> to three variables <code style="color:var(--cyan);">a</code>, <code style="color:var(--cyan);">b</code>, <code style="color:var(--cyan);">c</code> in a single line.</li></ol>
+<h3 style="color:var(--orange);font-size:0.88rem;margin:14px 0 8px;">🟡 Level 2 — Intermediate</h3>
+<ol style="margin-left:20px;line-height:2.2;" start="4"><li>Convert <code style="color:var(--cyan);">"3.14"</code> to float, multiply by 2, print result and type.</li><li>Run <code style="color:var(--cyan);">int("hello")</code> — explain the error in a comment.</li><li>Assign <code style="color:var(--cyan);">score = 95</code> then reassign to <code style="color:var(--cyan);">"Ninety Five"</code>. Print value and type each time.</li></ol>
+<h3 style="color:var(--orange);font-size:0.88rem;margin:14px 0 8px;">🔴 Level 3 — Challenge</h3>
+<ol style="margin-left:20px;line-height:2.2;" start="7"><li>Predict the output type of <code style="color:var(--cyan);">5/2</code> vs <code style="color:var(--cyan);">5//2</code> before running.</li><li>Take birth year as input, compute age, print <code style="color:var(--cyan);">f"You are {age} years old."</code></li><li>Set <code style="color:var(--cyan);">data = None</code>, check with <code>if</code> and print a message.</li></ol>
+<h3 style="color:var(--pink);font-size:0.88rem;margin:14px 0 8px;">⭐ Bonus</h3>
+<p style="margin-left:20px;">Swap <code style="color:var(--cyan);">a=10</code> and <code style="color:var(--cyan);">b=20</code> in one line without a temp variable.</p>`,
+
+    refs:`<h2 style="color:var(--cyan);font-size:1.1rem;margin-bottom:16px;font-family:'Space Mono',monospace;">🔗 References — Variables & Data Types</h2>${[
+['Python Official Docs — Built-in Types','https://docs.python.org/3/library/stdtypes.html','Complete reference for all Python built-in types including int, float, str, bool, and NoneType.'],
+['Python Docs — Assignment Statements','https://docs.python.org/3/reference/simple_stmts.html#assignment-statements','Official language reference for assignment statements and variable binding.'],
+['W3Schools — Python Variables','https://www.w3schools.com/python/python_variables.asp','Beginner-friendly tutorial with live examples covering variable creation, naming, and types.'],
+['Real Python — Basic Data Types','https://realpython.com/python-data-types/','In-depth article covering integers, floats, strings, and booleans with practical examples.'],
+['GeeksforGeeks — Python Data Types','https://www.geeksforgeeks.org/python-data-types/','Detailed explanations with diagrams and code examples for all Python data types.'],
+].map(([t,u,d])=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:13px 17px;margin-bottom:9px;" onmouseover="this.style.borderColor='var(--cyan)'" onmouseout="this.style.borderColor='var(--border)'"><a href="${u}" target="_blank" style="color:var(--cyan);font-family:'Space Mono',monospace;font-size:0.78rem;text-decoration:none;">↗ ${t}</a><p style="margin-top:5px;font-size:0.79rem;color:var(--text-muted);line-height:1.6;">${d}</p></div>`).join('')}`
+  },
+
+  "Ionic Bonds": {
+    notes:`<h2 style="color:var(--cyan);font-size:1.1rem;margin-bottom:16px;font-family:'Space Mono',monospace;">📄 Lecture Notes — Ionic Bonds</h2>
+<h3 style="color:var(--green);font-size:0.9rem;margin:14px 0 8px;">1. What is an Ionic Bond?</h3>
+<p>An <strong style="color:var(--text)">ionic bond</strong> forms by complete electron transfer from a metal to a non-metal, creating oppositely charged ions attracted to each other electrostatically.</p>
+<h3 style="color:var(--green);font-size:0.9rem;margin:14px 0 8px;">2. Formation — NaCl Example</h3>
+<div style="background:#02050f;border:1px solid var(--border);border-radius:8px;padding:13px;text-align:center;font-family:'Space Mono',monospace;font-size:0.82rem;line-height:2.4;color:#a8d8ff;">Na → Na⁺ + e⁻ &nbsp;<span style="color:var(--green);">(loses 1e⁻ → cation)</span><br>Cl + e⁻ → Cl⁻ &nbsp;<span style="color:var(--orange);">(gains 1e⁻ → anion)</span><br><span style="color:var(--cyan);font-size:1rem;">Na⁺ + Cl⁻ → NaCl</span></div>
+<h3 style="color:var(--green);font-size:0.9rem;margin:14px 0 8px;">3. Conditions Required</h3>
+<ul style="margin-left:20px;line-height:2.1;"><li>Electronegativity difference <strong>&gt;1.7</strong> (Pauling scale)</li><li>Metal readily <strong style="color:var(--cyan)">loses electrons</strong> (low ionisation energy)</li><li>Non-metal readily <strong style="color:var(--orange)">gains electrons</strong> (high electron affinity)</li><li>Both achieve <strong style="color:var(--green)">noble gas configuration</strong></li></ul>
+<h3 style="color:var(--green);font-size:0.9rem;margin:14px 0 8px;">4. Properties</h3>
+<table style="width:100%;border-collapse:collapse;font-size:0.82rem;"><tr style="color:var(--cyan);font-family:'Space Mono',monospace;border-bottom:1px solid var(--border);"><th style="padding:7px 10px;text-align:left;">Property</th><th style="padding:7px 10px;text-align:left;">Reason</th></tr>
+<tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 10px;color:var(--orange);">High melting point</td><td style="padding:7px 10px;">Strong electrostatic forces need large energy to break</td></tr>
+<tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 10px;color:var(--orange);">Crystalline solid</td><td style="padding:7px 10px;">Ions pack into regular 3D lattice</td></tr>
+<tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 10px;color:var(--orange);">Conducts when dissolved</td><td style="padding:7px 10px;">Free ions carry charge in solution</td></tr>
+<tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 10px;color:var(--orange);">Brittle</td><td style="padding:7px 10px;">Layer shift causes like-charge repulsion</td></tr>
+<tr><td style="padding:7px 10px;color:var(--orange);">Soluble in polar solvents</td><td style="padding:7px 10px;">Water molecules surround and separate ions</td></tr></table>
+<div style="margin-top:14px;padding:10px 14px;background:rgba(0,245,255,0.05);border-left:2px solid var(--cyan);border-radius:0 6px 6px 0;">💡 <strong style="color:var(--cyan);">Key Takeaway:</strong> Ionic bonds = electron transfer → ion formation → electrostatic attraction → crystal lattice.</div>`,
+
+    slides:`<h2 style="color:var(--cyan);font-size:1.1rem;margin-bottom:16px;font-family:'Space Mono',monospace;">📊 Slides — Ionic Bonds</h2>${[
+['Slide 1 — What is an Ionic Bond?','Electrostatic attraction between a cation (+) and anion (−) formed by complete electron transfer between a metal and a non-metal.'],
+['Slide 2 — Electron Transfer','Metals have low ionisation energy — lose electrons → cations. Non-metals have high electron affinity — gain electrons → anions.'],
+['Slide 3 — NaCl Formation','Na loses 1e⁻ → Na⁺. Cl gains 1e⁻ → Cl⁻. Oppositely charged ions attract, forming an NaCl crystal lattice.'],
+['Slide 4 — Conditions Required','(1) Electronegativity difference >1.7. (2) One element loses electrons easily. (3) Other element gains electrons easily.'],
+['Slide 5 — Crystal Lattice','Regular 3D arrangement of ions. In NaCl each Na⁺ is surrounded by 6 Cl⁻ ions — face-centred cubic structure.'],
+['Slide 6 — Properties','High melting point, brittle, crystalline solid, non-conductor as solid, good conductor when molten or dissolved.'],
+['Slide 7 — Lattice Energy','Energy released forming lattice from gaseous ions. Increases with higher ionic charge and smaller ionic radius.'],
+['Slide 8 — Summary','Ionic bonding = electron transfer → ions → attraction → lattice. Key examples: NaCl, MgO, CaCl₂, KBr.'],
+].map(([t,b])=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:13px 17px;margin-bottom:10px;"><div style="font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--cyan);margin-bottom:5px;">${t}</div><div style="font-size:0.84rem;color:var(--text-dim);line-height:1.7;">${b}</div></div>`).join('')}`,
+
+    practice:`<h2 style="color:var(--cyan);font-size:1.1rem;margin-bottom:16px;font-family:'Space Mono',monospace;">📝 Practice Sheet — Ionic Bonds</h2>
+<div style="padding:8px 13px;background:rgba(0,255,136,0.05);border-left:2px solid var(--green);border-radius:0 6px 6px 0;font-size:0.82rem;margin-bottom:16px;">Answer in your notebook. Draw electron dot diagrams where asked.</div>
+<h3 style="color:var(--orange);font-size:0.88rem;margin:14px 0 8px;">🟢 Section A — Short Answer</h3>
+<ol style="margin-left:20px;line-height:2.2;"><li>Define an ionic bond. How does it differ from a covalent bond?</li><li>State two conditions necessary for ionic bond formation.</li><li>Why do ionic compounds have high melting points?</li><li>What is lattice energy and how does ionic charge affect it?</li></ol>
+<h3 style="color:var(--orange);font-size:0.88rem;margin:14px 0 8px;">🟡 Section B — Diagrams</h3>
+<ol style="margin-left:20px;line-height:2.2;" start="5"><li>Draw Lewis dot structure for <strong>MgO</strong> formation. Label ions.</li><li>Why do ionic compounds conduct when molten but not solid?</li><li>Describe the NaCl lattice. How many Na⁺ surround each Cl⁻?</li></ol>
+<h3 style="color:var(--orange);font-size:0.88rem;margin:14px 0 8px;">🔴 Section C — Application</h3>
+<ol style="margin-left:20px;line-height:2.2;" start="8"><li>Order by increasing lattice energy: <strong>NaF, MgO, NaCl, CaO</strong>. Justify.</li><li>Predict ionic vs covalent for: K & Br, N & O, Ba & O.</li><li>Which has higher melting point — KCl or CaCl₂? Why?</li></ol>
+<h3 style="color:var(--pink);font-size:0.88rem;margin:14px 0 8px;">⭐ Bonus</h3>
+<p style="margin-left:20px;">Ionic compounds are brittle but metals are malleable. Explain the difference using particle theory.</p>`,
+
+    refs:`<h2 style="color:var(--cyan);font-size:1.1rem;margin-bottom:16px;font-family:'Space Mono',monospace;">🔗 References — Ionic Bonds</h2>${[
+['LibreTexts Chemistry — Ionic Bonding','https://chem.libretexts.org/Bookshelves/General_Chemistry/Map%3A_Chemistry_-_The_Central_Science_(Brown_et_al.)/08%3A_Basic_Concepts_of_Chemical_Bonding/8.02%3A_Ionic_Bonding','University-level coverage with diagrams, lattice energy, and worked examples.'],
+['Khan Academy — Ionic Bonds','https://www.khanacademy.org/science/ap-chemistry-beta/x2eef969c74e0d802:atomic-structure-and-properties/x2eef969c74e0d802:ions/a/ionic-bonds','Step-by-step video and article with interactive practice questions.'],
+['BBC Bitesize — Ionic Bonding','https://www.bbc.co.uk/bitesize/topics/z489dxs/articles/z86xtrd','Clear GCSE-level explanation with diagrams of NaCl and MgO formation.'],
+['Royal Society of Chemistry — Ionic Bonding','https://edu.rsc.org/resources/ionic-bonding/1540.article','Educator resource with lesson plans and student worksheets.'],
+['ChemGuide — Ionic Bonding','https://www.chemguide.co.uk/atoms/bonding/ionic.html','Detailed text covering ionic bond theory, properties, and lattice structures.'],
+].map(([t,u,d])=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:13px 17px;margin-bottom:9px;" onmouseover="this.style.borderColor='var(--cyan)'" onmouseout="this.style.borderColor='var(--border)'"><a href="${u}" target="_blank" style="color:var(--cyan);font-family:'Space Mono',monospace;font-size:0.78rem;text-decoration:none;">↗ ${t}</a><p style="margin-top:5px;font-size:0.79rem;color:var(--text-muted);line-height:1.6;">${d}</p></div>`).join('')}`
+  }
+};
+
+function updateDownloadButtons(topic) {
+  const hasAI = !!AI_DOCS[topic];
+  ['notes','slides','practice','refs'].forEach(k => {
+    document.getElementById('btn-'+k).style.display   = hasAI ? 'flex' : 'none';
+    document.getElementById('btn-s-'+k).style.display = hasAI ? 'none' : 'flex';
+  });
+  const sub = document.getElementById('dd-subtitle');
+  sub.textContent = hasAI ? '✦ AI materials available' : 'Materials for this topic';
+  sub.style.color = hasAI ? 'var(--cyan)' : 'var(--text-muted)';
+}
+
+function showAIDoc(type) {
+  const labels = {notes:'📄 Lecture Notes', slides:'📊 Slides', practice:'📝 Practice Sheet', refs:'🔗 References'};
+  const doc = AI_DOCS[currentTopic] && AI_DOCS[currentTopic][type];
+  if (!doc) return;
+  document.getElementById('modal-title').textContent = '// ' + labels[type] + ' — ' + currentTopic;
+  document.getElementById('modal-body').innerHTML = doc;
+  document.getElementById('ai-modal').style.display = 'flex';
+}
+
+// Init
 renderCourses();
 </script>
 </body>

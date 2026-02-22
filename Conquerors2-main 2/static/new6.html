@@ -4,185 +4,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Next-Gen Career Portal</title>
+    <title>EduPortal</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-glow: #6366f1;
-            --secondary-glow: #a855f7;
-            --card-bg: rgba(255, 255, 255, 0.03);
-            --card-border: rgba(255, 255, 255, 0.1);
+            --cyan: #00e5c3;
+            --cyan-dim: rgba(0, 229, 195, 0.15);
+            --cyan-border: rgba(0, 229, 195, 0.3);
+            --orange: #ff6b35;
+            --bg-deep: #0a0f14;
+            --bg-card: #0f1923;
+            --bg-card2: #111d2b;
+            --border: rgba(255,255,255,0.07);
+            --text-muted: #5a7a8a;
+            --text-mid: #8aa8b8;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-display: 'Syne', sans-serif;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body,
-        html {
-            margin: 0;
-            padding: 0;
-            background: #050505;
+        body, html {
+            background: var(--bg-deep);
             color: white;
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-display);
             scroll-behavior: smooth;
             overflow-x: hidden;
         }
 
-        /* --- DYNAMIC BACKGROUND --- */
+        /* Scanline overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.04) 2px,
+                rgba(0,0,0,0.04) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Grid bg */
         .mesh-bg {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: -1;
             background:
-                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+                radial-gradient(ellipse at 15% 20%, rgba(0, 229, 195, 0.06) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 80%, rgba(255, 107, 53, 0.05) 0%, transparent 55%);
         }
 
-        /* --- SECTION 1: HERO --- */
-        .hero-section {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            position: relative;
+        .mesh-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,229,195,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,229,195,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
         }
 
-        /* --- HEADER NAV --- */
+        /* NAV */
         .top-nav {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 40px;
+            padding: 18px 48px;
             z-index: 100;
-            background: rgba(5, 5, 5, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(10, 15, 20, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
         }
 
         .logo-text {
-            font-size: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
             font-weight: 700;
-            background: linear-gradient(to right, #fff, var(--secondary-glow));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--cyan);
+            letter-spacing: 0.05em;
         }
+
+        .logo-text span { color: white; }
+
+        .nav-tag {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .nav-right { display: flex; gap: 12px; align-items: center; }
 
         .nav-btn {
             background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 10px 24px;
-            border-radius: 12px;
+            border: 1px solid var(--border);
+            color: var(--text-mid);
+            padding: 9px 22px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: 0.3s;
-            font-size: 14px;
-            font-weight: 500;
+            transition: 0.2s;
+            font-size: 13px;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            letter-spacing: 0.03em;
         }
 
         .nav-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--primary-glow);
+            border-color: var(--cyan-border);
+            color: var(--cyan);
+            background: var(--cyan-dim);
         }
 
         .nav-btn.primary {
-            background: white;
+            background: var(--cyan);
             color: #000;
             border: none;
+            font-weight: 700;
         }
 
         .nav-btn.primary:hover {
-            background: #e2e8f0;
+            background: #00ffda;
+            transform: translateY(-1px);
+        }
+
+        /* HERO */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 20px 60px;
         }
 
         .glass-card {
             position: relative;
-            padding: 4rem 3rem;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 40px;
-            backdrop-filter: blur(20px);
+            padding: 3.5rem 3rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
             text-align: center;
-            max-width: 900px;
-            animation: fadeInDown 1.2s ease-out;
-            background-color: #282828;
+            max-width: 820px;
+            width: 100%;
+            animation: fadeInDown 1s ease-out;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+        }
+
+        .glass-card::after {
+            content: '';
+            position: absolute;
+            top: -80px; left: 50%;
+            transform: translateX(-50%);
+            width: 300px; height: 200px;
+            background: radial-gradient(circle, rgba(0,229,195,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--cyan);
+            border: 1px solid var(--cyan-border);
+            background: var(--cyan-dim);
+            padding: 6px 16px;
+            border-radius: 6px;
+            margin-bottom: 2rem;
+        }
+
+        .hero-badge::before {
+            content: '●';
+            font-size: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
         h1 {
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
-            margin: 0;
-            background: linear-gradient(to bottom right, #fff 40%, #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: clamp(2.2rem, 6vw, 4rem);
+            font-weight: 800;
             line-height: 1.1;
-        }
-
-        .search-container {
-            margin-top: 2.5rem;
-            display: flex;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 8px;
-            border-radius: 20px;
-            border: 1px solid var(--card-border);
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        input {
-            background: transparent;
-            border: none;
-            padding: 12px 20px;
             color: white;
-            outline: none;
-            min-width: 250px;
-            flex-grow: 1;
+            margin-bottom: 0.3em;
         }
 
-        .btn-main {
-            background: #fff;
-            color: #000;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
+        h1 .accent { color: var(--cyan); }
+
+        .hero-sub {
+            color: var(--text-mid);
+            margin: 1.5rem auto;
+            max-width: 520px;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            font-family: var(--font-mono);
         }
 
-        .btn-main:hover {
-            transform: scale(1.05);
-            background: #e2e8f0;
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
         }
 
-        /* --- SECTION 2: CHOOSE PATH --- */
+        .stat {
+            text-align: center;
+        }
+
+        .stat-num {
+            font-family: var(--font-mono);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--cyan);
+        }
+
+        .stat-label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .scroll-cue {
+            margin-top: 2rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            text-decoration: none;
+            display: inline-block;
+            transition: color 0.2s;
+        }
+
+        .scroll-cue:hover { color: var(--cyan); }
+
+        /* PATH SECTION */
         .path-section {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 4rem 1rem;
+            padding: 5rem 1.5rem;
+        }
+
+        .section-eyebrow {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--cyan);
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: 0.8s ease;
         }
 
         .section-title {
-            font-size: 3rem;
-            margin-bottom: 3rem;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 3.5rem;
             opacity: 0;
             transform: translateY(30px);
-            transition: 1s all ease;
+            transition: 1s ease;
+            text-align: center;
         }
+
+        .section-title .accent { color: var(--cyan); }
 
         .path-container {
             display: flex;
-            gap: 2rem;
-            max-width: 1100px;
+            gap: 1.5rem;
+            max-width: 1000px;
             width: 100%;
             justify-content: center;
             flex-wrap: wrap;
@@ -191,218 +312,433 @@
         .path-card {
             flex: 1;
             min-width: 300px;
-            background: #121212;
-            border: 1px solid #333;
-            border-radius: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
             padding: 2.5rem;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: 0;
             transform: translateY(50px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .path-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .path-card:hover {
-            border-color: var(--secondary-glow);
-            background: #1a1a1a;
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border-color: var(--cyan-border);
+            background: var(--bg-card2);
+            transform: translateY(-8px);
+            box-shadow: 0 24px 48px rgba(0,0,0,0.5), 0 0 0 1px var(--cyan-border);
         }
 
+        .path-card:hover::before { opacity: 1; }
+
         .icon-box {
-            width: 48px;
-            height: 48px;
-            background: #222;
-            border-radius: 12px;
+            width: 44px;
+            height: 44px;
+            background: var(--cyan-dim);
+            border: 1px solid var(--cyan-border);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 1.5rem;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+        }
+
+        .card-tag {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            color: var(--cyan);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
         }
 
         .path-card h3 {
-            font-size: 1.8rem;
-            margin: 0.5rem 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0.3rem 0 0.8rem;
+            line-height: 1.3;
         }
 
         .path-card p {
-            color: #888;
-            line-height: 1.6;
+            color: var(--text-mid);
+            line-height: 1.7;
             margin-bottom: 2rem;
+            font-size: 0.9rem;
+            font-family: var(--font-mono);
         }
-
 
         .btn-outline {
             display: block;
             width: 100%;
-            padding: 1rem;
-            border-radius: 12px;
-            border: 1px solid #444;
+            padding: 0.85rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
             background: transparent;
-            color: white;
+            color: var(--text-mid);
             font-weight: 600;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.2s;
             text-align: center;
             text-decoration: none;
-        }
-
-        .btn-filled {
-            background: white;
-            color: black;
-            border: none;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
         }
 
         .btn-outline:hover {
-            background: #222;
-            border-color: #666;
+            border-color: var(--cyan-border);
+            color: var(--cyan);
+            background: var(--cyan-dim);
         }
 
-        /* --- ANIMATION CLASSES --- */
-        .reveal {
-            opacity: 1 !important;
-            transform: translateY(0) !important;
+        .btn-filled {
+            background: var(--cyan);
+            color: #000;
+            border: none;
+            font-weight: 700;
         }
 
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .btn-filled:hover {
+            background: #00ffda !important;
+            color: #000 !important;
+            transform: translateY(-1px);
         }
 
         .app-links {
             display: flex;
             gap: 10px;
             margin-top: 1rem;
-            font-size: 0.8rem;
-            color: #666;
+            font-size: 0.72rem;
+            color: var(--text-muted);
             justify-content: center;
+            font-family: var(--font-mono);
         }
 
-        /* --- AUTH MODAL --- */
+        /* ANIMATIONS */
+        .reveal {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* MODAL */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            backdrop-filter: blur(4px);
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .modal-content {
-            background: #1a1a1a;
+            background: var(--bg-card);
             padding: 40px;
-            border-radius: 24px;
-            max-width: 450px;
+            border-radius: 16px;
+            max-width: 440px;
             width: 90%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
             position: relative;
+            overflow: hidden;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
         }
 
         .close-modal {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 18px; right: 20px;
             background: none;
             border: none;
-            color: #888;
-            font-size: 28px;
+            color: var(--text-muted);
+            font-size: 24px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.2s;
+            font-family: var(--font-mono);
         }
 
-        .close-modal:hover {
-            color: white;
-        }
+        .close-modal:hover { color: var(--cyan); }
 
         .modal-header h2 {
-            margin-bottom: 10px;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
+            margin-bottom: 6px;
         }
 
         .modal-header p {
-            color: #888;
-            margin-bottom: 30px;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .form-group { margin-bottom: 18px; }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            font-weight: 500;
+            margin-bottom: 7px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-mid);
         }
 
         .form-group input {
             width: 100%;
-            padding: 12px 16px;
-            background: #0a0a0a;
-            border: 1px solid #333;
-            border-radius: 10px;
+            padding: 11px 14px;
+            background: var(--bg-deep);
+            border: 1px solid var(--border);
+            border-radius: 8px;
             color: white;
-            font-size: 14px;
-            transition: 0.3s;
+            font-size: 0.9rem;
+            font-family: var(--font-mono);
+            transition: 0.2s;
+            min-width: unset;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: var(--primary-glow);
+            border-color: var(--cyan-border);
+            box-shadow: 0 0 0 3px rgba(0,229,195,0.08);
         }
 
         .submit-btn {
             width: 100%;
-            background: white;
+            background: var(--cyan);
             color: #000;
-            padding: 14px;
+            padding: 13px;
             border: none;
-            border-radius: 12px;
-            font-weight: 600;
+            border-radius: 8px;
+            font-weight: 700;
             cursor: pointer;
-            transition: 0.3s;
-            font-size: 15px;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            font-family: var(--font-mono);
+            letter-spacing: 0.05em;
         }
 
         .submit-btn:hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
+            background: #00ffda;
+            transform: translateY(-1px);
         }
 
         .form-toggle {
             text-align: center;
-            margin-top: 20px;
-            color: #888;
-            font-size: 14px;
+            margin-top: 18px;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-family: var(--font-mono);
         }
 
         .form-toggle a {
-            color: var(--primary-glow);
+            color: var(--cyan);
             text-decoration: none;
             font-weight: 600;
         }
 
-        .form-toggle a:hover {
-            color: var(--secondary-glow);
+        .form-toggle a:hover { opacity: 0.8; }
+
+        /* PROFILE SECTION */
+        .profile-section {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 20px 60px;
         }
 
-        .hidden {
-            display: none !important;
+        .profile-card {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 600px;
+            width: 100%;
+            animation: fadeInDown 1s ease-out;
+            overflow: hidden;
         }
+
+        .profile-card__top-line {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .profile-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 16px;
+            background: var(--cyan-dim);
+            border: 2px solid var(--cyan-border);
+            color: var(--cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 1.4rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: 0 0 24px rgba(0,229,195,0.15);
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .profile-id {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--cyan);
+            letter-spacing: 0.1em;
+            margin-bottom: 4px;
+        }
+
+        .profile-email {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-stat {
+            flex: 1;
+            background: var(--bg-card2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .profile-stat-val {
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--cyan);
+        }
+
+        .profile-stat-label {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .profile-tags {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .profile-tag {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-mid);
+            background: var(--bg-card2);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .profile-actions .btn-outline {
+            flex: 1;
+        }
+
+        /* Logged-in nav avatar */
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 14px 5px 6px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav-user:hover {
+            border-color: var(--cyan-border);
+            background: var(--cyan-dim);
+        }
+
+        .nav-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: var(--cyan-dim);
+            border: 1px solid var(--cyan-border);
+            color: var(--cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+
+        .nav-user-name {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 
@@ -412,53 +748,105 @@
 
     <!-- Top Navigation -->
     <nav class="top-nav">
-        <div class="logo-text">EduPortal</div>
-        <div style="display: flex; gap: 12px;">
-            <button class="nav-btn" onclick="openLoginModal()">Login</button>
-            <button class="nav-btn primary" onclick="openRegisterModal()">Get Started</button>
+        <div>
+            <div class="logo-text">// <span>EduPortal</span></div>
+            <div class="nav-tag">v2.0 · Learning OS</div>
+        </div>
+        <div class="nav-right" id="navRight">
+            <!-- Populated by JS based on session -->
         </div>
     </nav>
 
     <section class="hero-section">
         <div class="glass-card">
-            <span
-                style="color: var(--secondary-glow); letter-spacing: 2px; font-size: 0.8rem; text-transform: uppercase;">Trusted
-                by 2M+ Learners</span>
-            <h1>Learning that adapts<br> to every learner.</h1>
-            <p style="color: #94a3b8; margin: 1.5rem auto; max-width: 600px;">The modern way to find your next career
-                move with AI-driven matching and Visual Learning.</p>
+            <div class="hero-badge">Trusted by 2M+ Learners Worldwide</div>
+            <h1>Learning that adapts<br>to <span class="accent">every learner.</span></h1>
+            <p class="hero-sub">The modern way to find your next career move with AI-driven matching and Visual Learning.</p>
 
-            <!-- <div class="search-container">
-                <input type="text" placeholder="Search lessons, subjects or skills...">
-                <button class="btn-main">Search</button>
-            </div> -->
+            <div class="hero-stats">
+                <div class="stat">
+                    <div class="stat-num">2M+</div>
+                    <div class="stat-label">Active Learners</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">98%</div>
+                    <div class="stat-label">Satisfaction Rate</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">500+</div>
+                    <div class="stat-label">Courses Available</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">AI</div>
+                    <div class="stat-label">Powered Matching</div>
+                </div>
+            </div>
 
             <div style="margin-top: 2rem;">
-                <a href="#paths" style="color: #fff; text-decoration: none; font-size: 0.9rem; opacity: 0.6;">Scroll to
-                    explore ↓</a>
+                <a href="#paths" class="scroll-cue">[ scroll to explore ↓ ]</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROFILE SECTION — shown only when logged in -->
+    <section class="profile-section hidden" id="profileSection">
+        <div class="profile-card">
+            <div class="profile-card__top-line"></div>
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">JD</div>
+                <div class="profile-meta">
+                    <div class="profile-name" id="profileName">John Doe</div>
+                    <div class="profile-id" id="profileId">// PEC20CS001</div>
+                    <div class="profile-email" id="profileEmail">john@example.com</div>
+                </div>
+            </div>
+            <div class="profile-stats">
+                <div class="profile-stat">
+                    <div class="profile-stat-val" id="pCourses">0</div>
+                    <div class="profile-stat-label">Courses</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-val" id="pQuizzes">0</div>
+                    <div class="profile-stat-label">Quizzes Done</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-val" id="pScore">0%</div>
+                    <div class="profile-stat-label">Avg Score</div>
+                </div>
+            </div>
+            <div class="profile-tags">
+                <div class="profile-tag">📖 <span id="pReading">Grade 8</span></div>
+                <div class="profile-tag">👁 <span id="pVisual">Normal Mode</span></div>
+                <div class="profile-tag">🧠 <span id="pPattern">Mixed</span></div>
+            </div>
+            <div class="profile-actions">
+                <a href="new3.html" class="btn-outline btn-filled">Go to Dashboard →</a>
+                <button class="btn-outline" id="logoutBtnProfile">Logout</button>
             </div>
         </div>
     </section>
 
     <section class="path-section" id="paths">
-        <h2 class="section-title">Choose your <span style="color: var(--secondary-glow);">path.</span></h2>
+        <div class="section-eyebrow">// Select your mode</div>
+        <h2 class="section-title">Choose your <span class="accent">path.</span></h2>
 
         <div class="path-container">
             <div class="path-card">
                 <div class="icon-box">🏢</div>
+                <div class="card-tag">// Educators</div>
                 <h3>For Educators and Institutions</h3>
-                <p> AI-powered tools to make learning accessible through simplified text, audio, visuals, and adaptive
-                    interactions.</p>
-                <a class="btn-outline btn-filled" href="new8.html">Enable accessibilty </a>
+                <p>AI-powered tools to make learning accessible through simplified text, audio, visuals, and adaptive interactions.</p>
+                <a class="btn-outline btn-filled" href="new8.html">Enable Accessibility →</a>
             </div>
 
             <div class="path-card">
                 <div class="icon-box">🎓</div>
+                <div class="card-tag">// Learners</div>
                 <h3>For Learners</h3>
-                <p>Access learning in formats that fit you—text, audio, visuals, and adaptive experiences.</p>
-                <a href="new3.html" class="btn-outline">Visit Website</a>
+                <p>Access learning in formats that fit you—text, audio, visuals, and adaptive experiences tailored to your needs.</p>
+                <a href="new3.html" class="btn-outline">Visit Dashboard →</a>
                 <div class="app-links">
-                    <span> App Store</span>
+                    <span>▲ App Store</span>
                     <span>▶ Play Store</span>
                 </div>
             </div>
@@ -468,15 +856,14 @@
     <!-- Authentication Modal -->
     <div class="modal-overlay" id="authModal">
         <div class="modal-content">
-            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <button class="close-modal" onclick="closeModal()">✕</button>
 
             <!-- Login Form -->
             <div id="loginForm">
                 <div class="modal-header">
                     <h2>Welcome Back</h2>
-                    <p>Login to access your learning dashboard</p>
+                    <p>// Login to access your learning dashboard</p>
                 </div>
-
                 <form onsubmit="handleLogin(event)">
                     <div class="form-group">
                         <label>Student ID</label>
@@ -486,12 +873,10 @@
                         <label>Password</label>
                         <input type="password" id="loginPassword" placeholder="••••••••" required>
                     </div>
-                    <button type="submit" class="submit-btn">Login</button>
+                    <button type="submit" class="submit-btn">[ Login ]</button>
                 </form>
-
                 <div class="form-toggle">
-                    Don't have an account?
-                    <a href="#" onclick="switchToRegister(event)">Register here</a>
+                    Don't have an account? <a href="#" onclick="switchToRegister(event)">Register here</a>
                 </div>
             </div>
 
@@ -499,9 +884,8 @@
             <div id="registerForm" class="hidden">
                 <div class="modal-header">
                     <h2>Create Account</h2>
-                    <p>Join us to start your learning journey</p>
+                    <p>// Join us to start your learning journey</p>
                 </div>
-
                 <form onsubmit="handleRegister(event)">
                     <div class="form-group">
                         <label>Full Name</label>
@@ -521,24 +905,72 @@
                     </div>
                     <div class="form-group">
                         <label>Confirm Password</label>
-                        <input type="password" id="registerConfirmPassword" placeholder="••••••••" required
-                            minlength="6">
+                        <input type="password" id="registerConfirmPassword" placeholder="••••••••" required minlength="6">
                     </div>
-                    <button type="submit" class="submit-btn">Create Account</button>
+                    <button type="submit" class="submit-btn">[ Create Account ]</button>
                 </form>
-
                 <div class="form-toggle">
-                    Already have an account?
-                    <a href="#" onclick="switchToLogin(event)">Login here</a>
+                    Already have an account? <a href="#" onclick="switchToLogin(event)">Login here</a>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const API_BASE_URL = '/api';
+        // ── Session helpers ─────────────────────────────────────
+        function getSession()  { return JSON.parse(localStorage.getItem('edu_session') || 'null'); }
+        function clearSession(){ localStorage.removeItem('edu_session'); }
 
-        // Modal functions
+        // ── Nav: show profile chip or login/register buttons ─────
+        function renderNav(user) {
+            const navRight = document.getElementById('navRight');
+            if (user) {
+                const initials = user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+                navRight.innerHTML = `
+                    <div class="nav-user" onclick="scrollToProfile()">
+                        <div class="nav-avatar">${initials}</div>
+                        <div class="nav-user-name">${user.name.split(' ')[0]}</div>
+                    </div>
+                    <button class="nav-btn" onclick="logout()">Logout</button>
+                `;
+            } else {
+                navRight.innerHTML = `
+                    <button class="nav-btn" onclick="openLoginModal()">Login</button>
+                    <button class="nav-btn primary" onclick="openRegisterModal()">Get Started →</button>
+                `;
+            }
+        }
+
+        function scrollToProfile() {
+            document.getElementById('profileSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ── Profile section: populate and show ───────────────────
+        function renderProfile(user) {
+            if (!user) return;
+            const initials = user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+            document.getElementById('profileAvatar').textContent  = initials;
+            document.getElementById('profileName').textContent    = user.name;
+            document.getElementById('profileId').textContent      = '// ' + (user.student_id || '');
+            document.getElementById('profileEmail').textContent   = user.email || '';
+            document.getElementById('pCourses').textContent       = user.enrolled_courses || 0;
+            document.getElementById('pQuizzes').textContent       = user.quizzes_completed || 0;
+            document.getElementById('pScore').textContent         = (user.average_score || 0) + '%';
+            document.getElementById('pReading').textContent       = user.reading_level || 'Grade 8';
+            document.getElementById('pVisual').textContent        = user.visual_preference || 'Normal Mode';
+            document.getElementById('pPattern').textContent       = user.learning_pattern || 'Mixed';
+            document.getElementById('profileSection').classList.remove('hidden');
+        }
+
+        // ── Logout ───────────────────────────────────────────────
+        function logout() {
+            clearSession();
+            location.reload();
+        }
+
+        document.getElementById('logoutBtnProfile').addEventListener('click', logout);
+
+        // ── Modal helpers ─────────────────────────────────────────
         function openLoginModal() {
             document.getElementById('authModal').classList.add('active');
             document.getElementById('loginForm').classList.remove('hidden');
@@ -567,112 +999,75 @@
             document.getElementById('loginForm').classList.remove('hidden');
         }
 
-        // API functions
+        // ── Login (local — mirrors new3.html logic) ───────────────
+        function getUsers()   { return JSON.parse(localStorage.getItem('edu_users') || '{}'); }
+        function saveUsers(u) { localStorage.setItem('edu_users', JSON.stringify(u)); }
+        function saveSession(u){ localStorage.setItem('edu_session', JSON.stringify(u)); }
+
         async function handleLogin(e) {
             e.preventDefault();
-
-            const studentId = document.getElementById('loginStudentId').value;
-            const password = document.getElementById('loginPassword').value;
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        student_id: studentId,
-                        password: password
-                    })
-                });
-
-                const data = await response.json();
-
-                if (response.ok && data.token) {
-                    localStorage.setItem('authToken', data.token);
-                    localStorage.setItem('currentUser', JSON.stringify(data.user));
-                    alert('Login successful! Redirecting to dashboard...');
-                    window.location.href = '/new3.html';
-                } else {
-                    alert(data.error || 'Login failed. Please check your credentials.');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                alert('Unable to connect to server. Please ensure the backend is running.');
-            }
+            const studentId = document.getElementById('loginStudentId').value.trim();
+            const password  = document.getElementById('loginPassword').value;
+            const users     = getUsers();
+            const user      = users[studentId];
+            if (!user) { alert('No account found with that Student ID.'); return; }
+            if (user.password !== password) { alert('Incorrect password. Try again.'); return; }
+            const session = { ...user };
+            delete session.password;
+            saveSession(session);
+            closeModal();
+            renderNav(session);
+            renderProfile(session);
+            // Smooth scroll to profile
+            setTimeout(() => document.getElementById('profileSection').scrollIntoView({ behavior: 'smooth' }), 300);
         }
 
         async function handleRegister(e) {
             e.preventDefault();
-
-            const name = document.getElementById('registerName').value;
-            const studentId = document.getElementById('registerStudentId').value;
-            const email = document.getElementById('registerEmail').value;
+            const name     = document.getElementById('registerName').value.trim();
+            const studentId= document.getElementById('registerStudentId').value.trim();
+            const email    = document.getElementById('registerEmail').value.trim();
             const password = document.getElementById('registerPassword').value;
-            const confirmPassword = document.getElementById('registerConfirmPassword').value;
-
-            // Validate passwords match
-            if (password !== confirmPassword) {
-                alert('Passwords do not match!');
-                return;
-            }
-
-            // Validate password length
-            if (password.length < 6) {
-                alert('Password must be at least 6 characters long!');
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/auth/register`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        name: name,
-                        student_id: studentId,
-                        email: email,
-                        password: password
-                    })
-                });
-
-                const data = await response.json();
-
-                if (response.ok && data.token) {
-                    localStorage.setItem('authToken', data.token);
-                    localStorage.setItem('currentUser', JSON.stringify(data.user));
-                    alert('Account created successfully! Redirecting to dashboard...');
-                    window.location.href = '/new3.html';
-                } else {
-                    alert(data.error || 'Registration failed. Please try again.');
-                }
-            } catch (error) {
-                console.error('Registration error:', error);
-                alert('Unable to connect to server. Please ensure the backend is running.');
-            }
+            const confirm  = document.getElementById('registerConfirmPassword').value;
+            if (password !== confirm)   { alert('Passwords do not match!'); return; }
+            if (password.length < 6)    { alert('Password must be at least 6 characters!'); return; }
+            const users = getUsers();
+            if (users[studentId])       { alert('A user with this Student ID already exists.'); return; }
+            const newUser = {
+                name, student_id: studentId, email, password,
+                reading_level: 'Grade 8', visual_preference: 'Normal Mode', learning_pattern: 'Mixed',
+                enrolled_courses: 0, quizzes_completed: 0, average_score: 0,
+            };
+            users[studentId] = newUser;
+            saveUsers(users);
+            const session = { ...newUser };
+            delete session.password;
+            saveSession(session);
+            closeModal();
+            renderNav(session);
+            renderProfile(session);
+            setTimeout(() => document.getElementById('profileSection').scrollIntoView({ behavior: 'smooth' }), 300);
         }
 
-        // Simple Scroll Reveal Logic
-        const observerOptions = { threshold: 0.2 };
+        // ── Scroll reveal ─────────────────────────────────────────
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('reveal');
-                }
+                if (entry.isIntersecting) entry.target.classList.add('reveal');
             });
-        }, observerOptions);
+        }, { threshold: 0.15 });
 
-        // Elements to animate
-        document.querySelectorAll('.path-card, .section-title').forEach(el => observer.observe(el));
+        document.querySelectorAll('.path-card, .section-title, .section-eyebrow').forEach(el => observer.observe(el));
 
-        // Close modal on outside click
         document.getElementById('authModal').addEventListener('click', (e) => {
-            if (e.target.id === 'authModal') {
-                closeModal();
-            }
+            if (e.target.id === 'authModal') closeModal();
+        });
+
+        // ── Init ──────────────────────────────────────────────────
+        window.addEventListener('load', () => {
+            const session = getSession();
+            renderNav(session);
+            if (session) renderProfile(session);
         });
     </script>
 </body>
-
 </html>

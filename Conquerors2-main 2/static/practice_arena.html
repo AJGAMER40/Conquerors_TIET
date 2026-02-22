@@ -1044,7 +1044,8 @@
     let hintLevel = 1;
     let currentHint = null;
 
-    const token = localStorage.getItem('authToken');
+    const session = JSON.parse(localStorage.getItem('eduportal_session') || 'null');
+    const token = session ? session.token : null;
 
     // ── Init ───────────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', async () => {
@@ -1248,6 +1249,22 @@
             attempt_number: attemptNumber,
           }),
         });
+
+        if (!r.ok) {
+          let errMsg = `Server error (${r.status})`;
+          try {
+            const errData = await r.json();
+            errMsg = errData.error || errMsg;
+          } catch {
+            // Response wasn't JSON (e.g. HTML error page)
+            const text = await r.text().catch(() => '');
+            if (text) errMsg += ': The server returned an unexpected response. Check server logs.';
+          }
+          document.getElementById('tab-tests').innerHTML = `<div style="color:var(--danger)">${escHtml(errMsg)}</div>`;
+          document.getElementById('tab-ai').innerHTML = `<div style="color:var(--danger)">Submission failed.</div>`;
+          return;
+        }
+
         const d = await r.json();
 
         renderTestResults(d.test_results || []);
@@ -1282,7 +1299,7 @@
         // Switch to test tab
         switchTab('tests', document.querySelector('.rtab'));
       } catch (e) {
-        document.getElementById('tab-tests').innerHTML = `<div style="color:var(--danger)">Error: ${e.message}</div>`;
+        document.getElementById('tab-tests').innerHTML = `<div style="color:var(--danger)">Error: ${escHtml(e.message)}</div>`;
       } finally {
         btn.disabled = false;
         btn.textContent = '▶ Run & Judge';
