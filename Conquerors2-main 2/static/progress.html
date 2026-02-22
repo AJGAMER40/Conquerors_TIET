@@ -111,7 +111,7 @@
             z-index: 0;
         }
 
-        [data-theme="dark"] body::after {
+        body::after {
             content: '';
             position: fixed;
             top: -200px;
@@ -1100,7 +1100,7 @@
                 <li><a href="/new3.html" class="menu-item"><i class="fa-solid fa-house"></i> Dashboard</a></li>
                 <li><a href="/practice_arena.html" class="menu-item"><i class="fa-solid fa-dumbbell"></i> Practice
                         Arena</a></li>
-                <li><a href="/battle_arena.html" class="menu-item"><i class="fa-solid fa-swords"></i> Battle Arena</a>
+                <li><a href="/battle_arena.html" class="menu-item"><i class="fa-solid fa-bolt"></i> Battle Arena</a>
                 </li>
             </ul>
         </nav>
@@ -1270,17 +1270,73 @@
         // ── Logout ──
         document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.removeItem('eduportal_session');
-            window.location = '/new3.html';
+            // Only redirect if a real server path is available
+            if (window.location.protocol !== 'file:') {
+                window.location = '/new3.html';
+            }
         });
+
+        // ── Mock data (used when no backend is available) ──
+        const MOCK_DATA = {
+            xp: {
+                level: 7,
+                exp: 3450,
+                exp_for_next: 4000,
+                progress: 86,
+                sikke: 210
+            },
+            practice_stats: {
+                solved_count: 42,
+                difficulty_breakdown: {
+                    Easy: 24,
+                    Medium: 14,
+                    Hard: 4
+                }
+            },
+            coding_stats: {
+                success_rate: 78
+            },
+            battle_stats: {
+                total: 18,
+                won: 12,
+                lost: 6,
+                win_rate: 67
+            },
+            courses: [
+                { title: 'Introduction to Python', code: 'PY101', progress: 92 },
+                { title: 'Data Structures & Algorithms', code: 'CS201', progress: 65 },
+                { title: 'Web Development Fundamentals', code: 'WD101', progress: 40 },
+                { title: 'Machine Learning Basics', code: 'ML301', progress: 18 }
+            ]
+        };
 
         // ── Load progress data ──
         async function loadProgress() {
             const token = getToken();
-            if (!token) { window.location = '/new3.html'; return; }
+
+            // If running without a backend / no session, use mock data
+            if (!token) {
+                const d = MOCK_DATA;
+                renderXP(d.xp);
+                renderStats(d.practice_stats, d.coding_stats, d.battle_stats);
+                renderPracticeMastery(d.practice_stats.difficulty_breakdown);
+                renderBattle(d.battle_stats);
+                renderCourses(d.courses);
+                return;
+            }
 
             try {
                 const res = await fetch('/api/user/progress', { headers: { 'Authorization': 'Bearer ' + token } });
-                if (res.status === 401) { window.location = '/new3.html'; return; }
+                if (res.status === 401) {
+                    // Token invalid — show mock data instead of redirecting
+                    const d = MOCK_DATA;
+                    renderXP(d.xp);
+                    renderStats(d.practice_stats, d.coding_stats, d.battle_stats);
+                    renderPracticeMastery(d.practice_stats.difficulty_breakdown);
+                    renderBattle(d.battle_stats);
+                    renderCourses(d.courses);
+                    return;
+                }
                 const d = await res.json();
                 renderXP(d.xp);
                 renderStats(d.practice_stats, d.coding_stats, d.battle_stats);
@@ -1288,7 +1344,14 @@
                 renderBattle(d.battle_stats);
                 renderCourses(d.courses);
             } catch (err) {
-                console.error('Failed to load progress:', err);
+                // Network/API unavailable — fall back to mock data
+                console.warn('API unavailable, using mock data:', err);
+                const d = MOCK_DATA;
+                renderXP(d.xp);
+                renderStats(d.practice_stats, d.coding_stats, d.battle_stats);
+                renderPracticeMastery(d.practice_stats.difficulty_breakdown);
+                renderBattle(d.battle_stats);
+                renderCourses(d.courses);
             }
         }
 
@@ -1387,10 +1450,7 @@
 
         // ── Init ──
         window.addEventListener('load', () => {
-            const session = getSession();
-            if (!session) { window.location = '/new3.html'; return; }
-
-            // Initial load
+            // Always load progress (falls back to mock data if no session/API)
             loadProgress();
 
             // Live Sync: update every 30 seconds
